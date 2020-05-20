@@ -537,7 +537,7 @@ class JanusAdapter {
     return jsep
   }
 
-  async createSubscriber(occupantId) {
+  async createSubscriber(occupantId, maxRetries = 5) {
     if (this.leftOccupants.has(occupantId)) {
       console.warn(occupantId + ": cancelled occupant connection, occupant left before subscription negotation.");
       return null;
@@ -584,7 +584,7 @@ class JanusAdapter {
 
     // Send join message to janus. Don't listen for join/leave messages. Subscribe to the occupant's media.
     // Janus should send us an offer for this occupant's media in response to this.
-    const resp = await this.sendJoin(handle, { media: occupantId });
+    await this.sendJoin(handle, { media: occupantId });
 
     if (this.leftOccupants.has(occupantId)) {
       conn.close();
@@ -603,8 +603,13 @@ class JanusAdapter {
 
     if (webrtcFailed) {
       conn.close();
-      console.warn(occupantId + ": webrtc up timed out");
-      return null;
+      if (maxRetries > 0) {
+        console.warn(occupantId + ": webrtc up timed out, retrying");
+        return this.createSubscriber(occupantId, maxRetries - 1);
+      } else {
+        console.warn(occupantId + ": webrtc up timed out");
+        return null;
+      }
     }
 
     if (isSafari && !this._iOSHackDelayedInitialPeer) {
