@@ -1,8 +1,11 @@
 var mj = require("minijanus");
 var sdpUtils = require("sdp");
-var debug = require("debug")("naf-janus-adapter:debug");
-var warn = require("debug")("naf-janus-adapter:warn");
-var error = require("debug")("naf-janus-adapter:error");
+//var debug = require("debug")("naf-janus-adapter:debug");
+//var warn = require("debug")("naf-janus-adapter:warn");
+//var error = require("debug")("naf-janus-adapter:error");
+var debug = console.log;
+var warn = console.warn;
+var error = console.error;
 var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 const SUBSCRIBE_TIMEOUT_MS = 15000;
