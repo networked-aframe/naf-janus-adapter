@@ -353,26 +353,24 @@ class JanusAdapter {
 
     if (this.occupants[occupantId]) {
       // Close the subscriber peer connection. Which also detaches the plugin handle.
-      if (this.occupants[occupantId]) {
-        this.occupants[occupantId].conn.close();
-        delete this.occupants[occupantId];
-      }
-
-      if (this.mediaStreams[occupantId]) {
-        delete this.mediaStreams[occupantId];
-      }
-
-      if (this.pendingMediaRequests.has(occupantId)) {
-        const msg = "The user disconnected before the media stream was resolved.";
-        this.pendingMediaRequests.get(occupantId).audio.reject(msg);
-        this.pendingMediaRequests.get(occupantId).video.reject(msg);
-        this.pendingMediaRequests.delete(occupantId);
-      }
-
-      // Call the Networked AFrame callbacks for the removed occupant.
-      this.onOccupantDisconnected(occupantId);
-      this.onOccupantsChanged(this.occupants);
+      this.occupants[occupantId].conn.close();
+      delete this.occupants[occupantId];
     }
+
+    if (this.mediaStreams[occupantId]) {
+      delete this.mediaStreams[occupantId];
+    }
+
+    if (this.pendingMediaRequests.has(occupantId)) {
+      const msg = "The user disconnected before the media stream was resolved.";
+      this.pendingMediaRequests.get(occupantId).audio.reject(msg);
+      this.pendingMediaRequests.get(occupantId).video.reject(msg);
+      this.pendingMediaRequests.delete(occupantId);
+    }
+
+    // Call the Networked AFrame callbacks for the removed occupant.
+    this.onOccupantDisconnected(occupantId);
+    this.onOccupantsChanged(this.occupants);
   }
 
   associate(conn, handle) {
@@ -863,6 +861,9 @@ class JanusAdapter {
 
         this.pendingMediaRequests.get(clientId).audio.promise = audioPromise;
         this.pendingMediaRequests.get(clientId).video.promise = videoPromise;
+
+        audioPromise.catch(e => console.warn(`${clientId} getMediaStream Audio Error`, e));
+        videoPromise.catch(e => console.warn(`${clientId} getMediaStream Video Error`, e));
       }
       return this.pendingMediaRequests.get(clientId)[type].promise;
     }
@@ -872,9 +873,19 @@ class JanusAdapter {
     // Safari doesn't like it when you use single a mixed media stream where one of the tracks is inactive, so we
     // split the tracks into two streams.
     const audioStream = new MediaStream();
+    try {
     stream.getAudioTracks().forEach(track => audioStream.addTrack(track));
+
+    } catch(e) {
+      console.warn(`${clientId} setMediaStream Audio Error`, e);
+    }
     const videoStream = new MediaStream();
+    try {
     stream.getVideoTracks().forEach(track => videoStream.addTrack(track));
+
+    } catch (e) {
+      console.warn(`${clientId} setMediaStream Video Error`, e);
+    }
 
     this.mediaStreams[clientId] = { audio: audioStream, video: videoStream };
 
