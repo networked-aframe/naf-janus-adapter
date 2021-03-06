@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/naf-janus-adapter.svg)](https://www.npmjs.com/package/naf-janus-adapter)
 
-Network adapter for [networked-aframe](https://github.com/haydenjameslee/networked-aframe) that uses the Janus WebRTC server as a backend.
+Network adapter for [networked-aframe](https://github.com/networked-aframe/networked-aframe) that uses the Janus WebRTC server as a backend.
 
 ## Usage
 
