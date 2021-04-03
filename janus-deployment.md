@@ -2,7 +2,7 @@ Example on ubuntu 18.04, you need to build libwebsocket libsrtp libnice usrsctp 
 Please use latest versions if possible to have the latest security patches, this doc won't necessary be updated.
 
 ```
-apt-get -y update && apt-get install -y libmicrohttpd-dev \
+sudo apt-get -y update && apt-get install -y libmicrohttpd-dev \
     libjansson-dev \
     libnice-dev \
     libssl-dev \
@@ -32,7 +32,7 @@ cd libwebsockets-$LIBWEBSOCKET && \
 mkdir build && \
 cd build && \
 cmake -DLWS_MAX_SMP=1 -DLWS_WITHOUT_EXTENSIONS=0 -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_C_FLAGS="-fpic" .. && \
-make && make install
+make && sudo make install
 
 SRTP="2.3.0" && apt-get remove -y libsrtp0-dev libsrtp0 && wget https://github.com/cisco/libsrtp/archive/v$SRTP.tar.gz && \
 tar xfv v$SRTP.tar.gz && \
@@ -55,7 +55,7 @@ cd libnice && \
 git checkout 36aa468c4916cfccd4363f0e27af19f2aeae8604 && \
 meson --prefix=/usr build && \
 ninja -C build && \
-ninja -C build install
+sudo ninja -C build install
 
 # datachannel build
 # Jan 13, 2021 0.9.5.0 07f871bda23943c43c9e74cc54f25130459de830
@@ -63,7 +63,7 @@ cd /tmp && git clone https://github.com/sctplab/usrsctp.git && cd /usrsctp && \
 git checkout 0.9.5.0 && \
 ./bootstrap && \
 ./configure --prefix=/usr --disable-programs --disable-inet --disable-inet6 && \
-make && make install
+make && sudo make install
 
 # 2021-02-23 14:57 caaba91081ba8e5578a24bca1495a8572f08e65c (post v0.10.10)
 cd /tmp && git clone https://github.com/meetecho/janus-gateway.git && cd /tmp/janus-gateway && \
@@ -71,14 +71,14 @@ git checkout caaba91081ba8e5578a24bca1495a8572f08e65c && \
 sh autogen.sh &&  \
 CFLAGS="${CFLAGS} -fno-omit-frame-pointer" ./configure --prefix=/usr \
 --disable-all-plugins --disable-all-handlers && \
-make && make install && make configs
+make && sudo make install && sudo make configs
 
 cd /tmp && git clone -b master https://github.com/mozilla/janus-plugin-sfu.git && cd /tmp/janus-plugin-sfu && \
 cargo build --release && \
-mkdir -p "/usr/lib/janus/plugins" && \
-mkdir -p "/usr/lib/janus/events" && \
-cp /tmp/janus-plugin-sfu/target/release/libjanus_plugin_sfu.so "/usr/lib/janus/plugins" && \
-cp /tmp/janus-plugin-sfu/janus.plugin.sfu.cfg.example /usr/etc/janus/janus.plugin.sfu.cfg
+sudo mkdir -p "/usr/lib/janus/plugins" && \
+sudo mkdir -p "/usr/lib/janus/events" && \
+sudo cp /tmp/janus-plugin-sfu/target/release/libjanus_plugin_sfu.so "/usr/lib/janus/plugins" && \
+sudo cp /tmp/janus-plugin-sfu/janus.plugin.sfu.cfg.example /usr/etc/janus/janus.plugin.sfu.cfg
 ```
 
 You  need to open the rtp port range (UDP) on your server firewall.
