@@ -1,5 +1,20 @@
-Example on ubuntu 18.04, you need to build libwebsocket libsrtp libnice usrsctp janus-gateway janus-plugin-sfu
-Please use latest versions if possible to have the latest security patches, this doc won't necessary be updated.
+# Janus deployment on Ubuntu 18.04
+
+This tutorial should work on Ubuntu 18.04 on a GCP instance or Scaleway instance.
+
+You need to build from source several components: libwebsocket, libsrtp, libnice, usrsctp, janus-gateway and janus-plugin-sfu.
+
+You can follow the build instructions below but you should use latest versions if possible to have the latest security updates.
+This documentation won't necessary be updated.
+
+Look at the [README history of janus-gateway](https://github.com/meetecho/janus-gateway/commits/master/README.md) to see if the build instructions
+for some components changed, this happened several times. The build instructions below was up to date the Mar 25, 2021.
+Look at the changes in master or releases in the different repositories of the components you need to build to see if you can update them.
+
+Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [https://github.com/mozilla/janus-plugin-sfu.git](janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
+
+Here are the build instructions that produced a good working deployment at the
+time of writing this tutorial:
 
 ```
 sudo apt-get -y update && apt-get install -y libmicrohttpd-dev \
@@ -68,7 +83,7 @@ make && sudo make install
 # 2021-04-02 17:40 4dd379ab6952ccaaa027d5c150da1fbf0fecff16 (post v0.10.10)
 cd /tmp && git clone https://github.com/meetecho/janus-gateway.git && cd /tmp/janus-gateway && \
 git checkout 4dd379ab6952ccaaa027d5c150da1fbf0fecff16 && \
-sh autogen.sh &&  \
+sh autogen.sh && \
 CFLAGS="${CFLAGS} -fno-omit-frame-pointer" ./configure --prefix=/usr \
 --disable-all-plugins --disable-all-handlers && \
 make && sudo make install && sudo make configs
@@ -81,8 +96,7 @@ sudo cp /tmp/janus-plugin-sfu/target/release/libjanus_plugin_sfu.so "/usr/lib/ja
 sudo cp /tmp/janus-plugin-sfu/janus.plugin.sfu.cfg.example /usr/etc/janus/janus.plugin.sfu.cfg
 ```
 
-You  need to open the rtp port range (UDP) on your server firewall.
-You may configure the port range explicitly in janus.jcfg (keep the original but change these values)
+janus.jcfg config file (keep the original but change these values):
 
 ```
 general: {
@@ -104,7 +118,8 @@ transports: {
 }
 ```
 
-janus.transport.websockets.jcfg (these values only)
+janus.transport.websockets.jcfg (these values only):
+
 ```
 general: {
   json = "indented"
@@ -123,7 +138,6 @@ certificates: {
 }
 ```
 
-
 You can change some options like `max_room_size` option in `/usr/etc/janus/janus.plugin.sfu.cfg`
 
 example:
@@ -135,11 +149,19 @@ max_ccu = 1000
 message_threads = 3
 ```
 
-and allow the UDP 51610-65535 on your server's firewall.
+For GCP, you need to open 443 and the rtp port range 51610-65535 (UDP) in your security rules.
 
-If you want to start janus as a systemd service, look at https://github.com/meetecho/janus-gateway/pull/2591#issuecomment-812480322
+For Scaleway, you need to expose 443 and have stateful security policy for the rtp port range to work.
+
+Now to test, in your ssh terminal run:
+
+    janus
+
+If you want to start janus as a systemd service with a janus user,
+look at https://github.com/meetecho/janus-gateway/pull/2591#issuecomment-812480322
 
 When you start janus, with a working deployment you should have something like this:
+
 ```
 Janus commit: caaba91081ba8e5578a24bca1495a8572f08e65c
 Compiled on:  Tue Mar 16 08:37:18 UTC 2021
@@ -190,6 +212,7 @@ Debug/log colors are enabled
 ```
 
 Example of nginx conf:
+
 ```
 server {
   listen      [::]:80;
@@ -244,6 +267,7 @@ server {
 ```
 
 Generate letsencrypt certificate
+
 ```
 mkdir -p /var/www/webroot
 certbot certonly --deploy-hook "nginx -s reload" --webroot -w /var/www/webroot -d preprod.example.com
@@ -252,7 +276,6 @@ certbot certonly --deploy-hook "nginx -s reload" --webroot -w /var/www/webroot -
 You can do a quick check of your nginx conf
 If you go to https://preprod.example.com/janus and it shows 403, then the
 websocket part is probably ok.
-
 
 In the nginx conf I gave above, in the /home/user/vr/public path (you can change that), put the html files from
 https://github.com/networked-aframe/naf-janus-adapter/tree/3.0.x/examples
