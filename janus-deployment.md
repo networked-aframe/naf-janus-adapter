@@ -118,6 +118,8 @@ transports: {
 }
 ```
 
+About the `session_timeout = 38` value, see [this discussion](https://github.com/mozilla/janus-plugin-sfu/pull/73#issuecomment-776649237).
+
 janus.transport.websockets.jcfg (these values only):
 
 ```
