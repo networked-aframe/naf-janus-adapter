@@ -126,6 +126,56 @@ and allow the UDP 51610-65535 on your server's firewall.
 
 If you want to start janus as a systemd service, look at https://github.com/meetecho/janus-gateway/pull/2591#issuecomment-812480322
 
+When you start janus, with a working deployment you should have something like this:
+```
+Janus commit: caaba91081ba8e5578a24bca1495a8572f08e65c
+Compiled on:  Tue Mar 16 08:37:18 UTC 2021
+
+Logger plugins folder: /usr/lib/janus/loggers
+[WARN] 	Couldn't access logger plugins folder...
+---------------------------------------------------
+  Starting Meetecho Janus (WebRTC Server) v0.11.1
+---------------------------------------------------
+
+Checking command line arguments...
+Debug/log level is 4
+Debug/log timestamps are enabled
+Debug/log colors are enabled
+[Sat Apr  3 09:15:18 2021] Adding 'vmnet' to the ICE ignore list...
+[Sat Apr  3 09:15:18 2021] [WARN] Added vmnet to the ICE ignore list, but the ICE enforce list is not empty: the ICE ignore list will not be used
+[Sat Apr  3 09:15:18 2021] Using x.x.x.x as local IP...
+[Sat Apr  3 09:15:18 2021] Token based authentication disabled
+[Sat Apr  3 09:15:18 2021] Initializing recorder code
+[Sat Apr  3 09:15:18 2021] RTP port range: 51610 -- 65535
+[Sat Apr  3 09:15:18 2021] Using nat_1_1_mapping for public IP: YOUR_PUBLIC_IP
+[Sat Apr  3 09:15:18 2021] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Sat Apr  3 09:15:18 2021] ICE port range: 51610-65535
+[Sat Apr  3 09:15:18 2021] [WARN] mDNS resolution disabled, .local candidates will be ignored
+[Sat Apr  3 09:15:18 2021] Configuring Janus to use ICE aggressive nomination
+[Sat Apr  3 09:15:18 2021] Crypto: OpenSSL >= 1.1.0
+[Sat Apr  3 09:15:18 2021] No cert/key specified, autogenerating some...
+[Sat Apr  3 09:15:18 2021] Fingerprint of our certificate: FA:B9:C7:D9:9F:C8:58:0D:30:34:34:B4:57:1C:E5:0C:10:A2:AA:3F:A9:7F:A3:18:0B:05:BC:79:9D:CF:D2:AF
+[Sat Apr  3 09:15:18 2021] Event handler plugins folder: /usr/lib/janus/events
+[Sat Apr  3 09:15:18 2021] Sessions watchdog started
+[Sat Apr  3 09:15:18 2021] Setting event handlers statistics period to 5 seconds
+[Sat Apr  3 09:15:18 2021] Plugins folder: /usr/lib/janus/plugins
+[Sat Apr  3 09:15:18 2021] Loading plugin 'libjanus_plugin_sfu.so'...
+[Sat Apr  3 09:15:18 2021] Joining Janus requests handler thread
+[Sat Apr  3 09:15:18 2021] Loaded SFU plugin configuration: Config { auth_key: None, max_room_size: 15, max_ccu: 1000, message_threads: 3 }
+[Sat Apr  3 09:15:18 2021] Janus SFU plugin initialized!
+[Sat Apr  3 09:15:18 2021] Transport plugins folder: /usr/lib/janus/transports
+[Sat Apr  3 09:15:18 2021] [WARN] Transport plugin 'libjanus_pfunix.so' has been disabled, skipping...
+[Sat Apr  3 09:15:18 2021] Loading transport plugin 'libjanus_http.so'...
+[Sat Apr  3 09:15:18 2021] HTTP transport timer started
+[Sat Apr  3 09:15:18 2021] Admin/monitor HTTP webserver started (port 7088, /admin path listener)...
+[Sat Apr  3 09:15:18 2021] JANUS REST (HTTP/HTTPS) transport plugin initialized!
+[Sat Apr  3 09:15:18 2021] Loading transport plugin 'libjanus_websockets.so'...
+[Sat Apr  3 09:15:18 2021] [WARN] libwebsockets has been built without IPv6 support, will bind to IPv4 only
+[Sat Apr  3 09:15:18 2021] libwebsockets logging: 0
+[Sat Apr  3 09:15:18 2021] WebSockets server started (port 8188)...
+[Sat Apr  3 09:15:18 2021] JANUS WebSockets transport plugin initialized!
+[Sat Apr  3 09:15:18 2021] WebSockets thread started
+```
 
 Example of nginx conf:
 ```
