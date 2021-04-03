@@ -246,6 +246,14 @@ mkdir -p /var/www/webroot
 certbot certonly --deploy-hook "nginx -s reload" --webroot -w /var/www/webroot -d preprod.example.com
 ```
 
+You can do a quick check of your nginx conf
+If you go to https://preprod.example.com/janus and it shows 403, then the
+websocket part is probably ok.
+
+
+In the nginx conf I gave above, in the /home/user/vr/public path (you can change that), put the html files from
+https://github.com/networked-aframe/naf-janus-adapter/tree/3.0.x/examples
+modify the janus url in the html files with wss://preprod.example.com/janus and you should be able to access the examples at https://preprod.example.com
 
 In browser logs you should see:
 ```
