@@ -65,9 +65,9 @@ git checkout 0.9.5.0 && \
 ./configure --prefix=/usr --disable-programs --disable-inet --disable-inet6 && \
 make && sudo make install
 
-# 2021-02-23 14:57 caaba91081ba8e5578a24bca1495a8572f08e65c (post v0.10.10)
+# 2021-04-02 17:40 4dd379ab6952ccaaa027d5c150da1fbf0fecff16 (post v0.10.10)
 cd /tmp && git clone https://github.com/meetecho/janus-gateway.git && cd /tmp/janus-gateway && \
-git checkout caaba91081ba8e5578a24bca1495a8572f08e65c && \
+git checkout 4dd379ab6952ccaaa027d5c150da1fbf0fecff16 && \
 sh autogen.sh &&  \
 CFLAGS="${CFLAGS} -fno-omit-frame-pointer" ./configure --prefix=/usr \
 --disable-all-plugins --disable-all-handlers && \
