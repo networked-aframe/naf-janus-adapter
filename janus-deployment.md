@@ -77,7 +77,8 @@ cd /tmp && git clone -b master https://github.com/mozilla/janus-plugin-sfu.git &
 cargo build --release && \
 mkdir -p "/usr/lib/janus/plugins" && \
 mkdir -p "/usr/lib/janus/events" && \
-cp /tmp/janus-plugin-sfu/target/release/libjanus_plugin_sfu.so "/usr/lib/janus/plugins"
+cp /tmp/janus-plugin-sfu/target/release/libjanus_plugin_sfu.so "/usr/lib/janus/plugins" && \
+cp /tmp/janus-plugin-sfu/janus.plugin.sfu.cfg.example /usr/etc/janus/janus.plugin.sfu.cfg
 ```
 
 You  need to open the rtp port range (UDP) on your server firewall.
@@ -123,7 +124,10 @@ certificates: {
 ```
 
 
-janus.plugin.sfu.cfg example:
+You can change some options like `max_room_size` option in `/usr/etc/janus/janus.plugin.sfu.cfg`
+
+example:
+
 ```
 [general]
 max_room_size = 15
