@@ -151,7 +151,6 @@ Debug/log level is 4
 Debug/log timestamps are enabled
 Debug/log colors are enabled
 [Sat Apr  3 09:15:18 2021] Adding 'vmnet' to the ICE ignore list...
-[Sat Apr  3 09:15:18 2021] [WARN] Added vmnet to the ICE ignore list, but the ICE enforce list is not empty: the ICE ignore list will not be used
 [Sat Apr  3 09:15:18 2021] Using x.x.x.x as local IP...
 [Sat Apr  3 09:15:18 2021] Token based authentication disabled
 [Sat Apr  3 09:15:18 2021] Initializing recorder code
