@@ -96,7 +96,7 @@ media: {
 nat: {
   nice_debug = false  # set it to true to have more logs
   ignore_mdns = true
-  nat_1_1_mapping = YOUR_PUBLIC_IP
+  nat_1_1_mapping = "YOUR_PUBLIC_IP"
 }
 transports: {
   disable = "libjanus_pfunix.so"
