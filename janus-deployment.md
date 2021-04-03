@@ -389,3 +389,7 @@ and in websocket messages:
 
 then you have an issue with your security rules. Double check you opened the
 rtp port range.
+
+On Firefox, you can go to `about:webrtc` to see the ICE candidates.
+
+On Chrome: `chrome://webrtc-internals`
