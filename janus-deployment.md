@@ -157,8 +157,22 @@ Now to test, in your ssh terminal run:
 
     janus
 
-If you want to start janus as a systemd service with a janus user,
+If you want to start janus as a systemd service with a janus user
 look at https://github.com/meetecho/janus-gateway/pull/2591#issuecomment-812480322
+
+instructions not tested:
+
+```
+sudo -i
+addgroup --system janus
+adduser --system --home --shell /bin/false --no-create-home --ingroup janus --disabled-password --disabled-login janus
+vim /etc/systemd/system/janus.service # copy the content of the comment linked above
+systemctl daemon-reload
+# be sure to stop ctrl+c the previous janus launched before
+systemctl start janus
+systemctl status janus
+```
+
 
 When you start janus, with a working deployment you should have something like this:
 
