@@ -256,6 +256,7 @@ https://github.com/networked-aframe/naf-janus-adapter/tree/3.0.x/examples
 modify the janus url in the html files with wss://preprod.example.com/janus and you should be able to access the examples at https://preprod.example.com
 
 In browser logs you should see:
+
 ```
 connecting to wss://preprod.example.com/janus
 broadcastDataGuaranteed called without a publisher
@@ -270,3 +271,121 @@ publisher ready
 ICE state changed to connected
 new server time offset: -193.45ms
 ```
+
+In janus logs you should have something like this:
+
+```
+[Sat Apr  3 09:21:41 2021] Processing JSEP offer from 0x7fdf10004ef0: Sdp { v=0
+o=- 4998836701810448042 2 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 1.1.1.1
+a=sendrecv
+ }
+[Sat Apr  3 09:21:41 2021] [WARN] [483089393870788] Failed to add some remote candidates (added 0, expected 1)
+[Sat Apr  3 09:21:41 2021] [483089393870788] The DTLS handshake has been completed
+[Sat Apr  3 09:21:41 2021] WebRTC media is now available on 0x7fdf10004ef0.
+[Sat Apr  3 09:21:41 2021] Processing join-time subscription from 0x7fdf10004ef0: Subscription { notifications: true, data: true, media: None }.
+[Sat Apr  3 09:21:42 2021] [483089393870788] Negotiation update, checking what changed...
+[Sat Apr  3 09:21:42 2021] Processing JSEP offer from 0x7fdf10004ef0: Sdp { v=0
+o=- 4998836701810448042 3 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 1.1.1.1
+a=sendrecv
+m=audio 9 UDP/TLS/RTP/SAVPF 111 103 104 9 0 8 106 105 13 110 112 113 126
+c=IN IP4 1.1.1.1
+a=sendrecv
+a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level
+a=extmap:2 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time
+a=extmap:3 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01
+a=extmap:4 urn:ietf:params:rtp-hdrext:sdes:mid
+a=extmap:5 urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id
+a=extmap:6 urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id
+a=rtpmap:111 opus/48000/2
+a=rtcp-fb:111 transport-cc
+a=fmtp:111 minptime=10;useinbandfec=1;usedtx=1;stereo;sprop-stereo
+a=rtpmap:103 ISAC/16000
+a=rtpmap:104 ISAC/32000
+a=rtpmap:9 G722/8000
+a=rtpmap:0 PCMU/8000
+a=rtpmap:8 PCMA/8000
+a=rtpmap:106 CN/32000
+a=rtpmap:105 CN/16000
+a=rtpmap:13 CN/8000
+a=rtpmap:110 telephone-event/48000
+a=rtpmap:112 telephone-event/32000
+a=rtpmap:113 telephone-event/16000
+a=rtpmap:126 telephone-event/8000
+ }
+[Sat Apr  3 09:21:42 2021] [WARN] [483089393870788] Failed to add some remote candidates (added 0, expected 1)
+# When I close the window
+[Sat Apr  3 09:48:36 2021] Hanging up WebRTC media on 0x7fdf10004ef0.
+[Sat Apr  3 09:48:36 2021] [483089393870788] WebRTC resources freed; 0x7fdf34001a70 0x7fdf34001920
+[Sat Apr  3 09:48:36 2021] [WSS-0x7fdf10000b20] Destroying WebSocket client
+[Sat Apr  3 09:48:36 2021] Destroying session 7233936804242019; 0x7fdf34001920
+[Sat Apr  3 09:48:36 2021] Detaching handle from Janus SFU plugin; 0x7fdf34001a70 0x7fdf10004ef0 0x7fdf34001a70 0x7fdf340017d0
+[Sat Apr  3 09:48:36 2021] Destroying SFU session 0x7fdf10004ef0...
+[Sat Apr  3 09:48:36 2021] [483089393870788] Handle and related resources freed; 0x7fdf34001a70 0x7fdf34001920
+```
+
+In the websocket messages exchanged, you have this (open Chrome Network tab,
+and on the websocket resource, click on Messages tab):
+
+```
+{"janus":"create","transaction":"0"}
+{"janus": "success","transaction": "0","data": {"id": 4332580640433269}}
+{"session_id":4332580640433269,"janus":"attach","transaction":"1","plugin":"janus.plugin.sfu","force-bundle":true,"force-rtcp-mux":true}
+{"janus": "success","session_id": 4332580640433269,"transaction": "1","data": {"id": 2534645948739130}}
+{"session_id":4332580640433269,"janus":"message","transaction":"2","handle_id":2534645948739130,"body":{},"jsep":{"type":"offer","sdp":"..."}}
+{"session_id":4332580640433269,"janus":"trickle","transaction":"3","handle_id":2534645948739130,"candidate":{"candidate":"...","sdpMid":"0","sdpMLineIndex":0}}
+{"session_id":4332580640433269,"janus":"trickle","transaction":"4","handle_id":2534645948739130,"candidate":{"candidate":"...","sdpMid":"0","sdpMLineIndex":0}}
+{"session_id":4332580640433269,"janus":"trickle","transaction":"5","handle_id":2534645948739130,"candidate":{"candidate":"candidate:2087201215 1 udp 2122129151 MY_IP 39264 typ host generation 0 ufrag Ts8C network-id 2","sdpMid":"0","sdpMLineIndex":0}}
+{"janus": "ack","session_id": 4332580640433269,"transaction": "3"}
+{"janus": "ack","session_id": 4332580640433269,"transaction": "2","hint": "Processing."}
+{"janus": "event","session_id": 4332580640433269,"transaction": "2","sender": 2534645948739130,"plugindata": {"plugin": "janus.plugin.sfu","data": {"success": true}},"jsep": {"type": "answer","sdp": "..."}}
+{"janus": "ack","session_id": 4332580640433269,"transaction": "4"}
+{"janus": "ack","session_id": 4332580640433269,"transaction": "5"}
+{"session_id":4332580640433269,"janus":"trickle","transaction":"6","handle_id":2534645948739130,"candidate":null}
+{"janus": "ack","session_id": 4332580640433269,"transaction": "6"}
+{"janus": "webrtcup","session_id": 4332580640433269,"sender": 2534645948739130}
+```
+
+If you have something like this:
+
+```
+Creating new session: 1828495247198092; 0x7fa380015890
+Creating new handle in session 1828495247198092: 7076818936776347; 0x7fa380015890 0x7fa3800166a0
+Initializing SFU session 0x7fa380013bd0...
+[7076818936776347] Creating ICE agent (ICE Full mode, controlled)
+[WARN] [7076818936776347] Skipping disabled/unsupported media line...
+Processing JSEP offer from 0x7fa380013bd0: Sdp { v=0
+o=mozilla...THIS_IS_SDPARTA-87.0 771674382979274585 0 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 1.1.1.1
+a=sendrecv
+ }
+[WARN] [7076818936776347] Skipping disabled/unsupported media line...
+[WARN] [7076818936776347] ICE failed for component 1 in stream 1, but let's give it some time... (trickle received, answer received, alert not set)
+[WSS-0xfa0400] Destroying WebSocket client
+Destroying session 1828495247198092; 0x7fa380015890
+Detaching handle from Janus SFU plugin; 0x7fa3800166a0 0x7fa380013bd0 0x7fa3800166a0 0x7fa380006d50
+Hanging up WebRTC media on 0x7fa380013bd0.
+[7076818936776347] WebRTC resources freed; 0x7fa3800166a0 0x7fa380015890
+Destroying SFU session 0x7fa380013bd0...
+[7076818936776347] Handle and related resources freed; 0x7fa3800166a0 0x7fa380015890
+```
+
+and in websocket messages:
+
+```
+{"janus": "event","session_id": 4332580640433269,"transaction": "2","sender": 2534645948739130,"plugindata": {"plugin": "janus.plugin.sfu","data": {"success": true}},"jsep": {"type": "answer","sdp": "..."}}
+{ "janus": "hangup","session_id": 4332580640433269,"sender": 2534645948739130,"reason": "ICE failed"}
+```
+
+then you have an issue with your security rules. Double check you opened the
+rtp port range.
