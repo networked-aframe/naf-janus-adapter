@@ -245,3 +245,20 @@ Generate letsencrypt certificate
 mkdir -p /var/www/webroot
 certbot certonly --deploy-hook "nginx -s reload" --webroot -w /var/www/webroot -d preprod.example.com
 ```
+
+
+In browser logs you should see:
+```
+connecting to wss://preprod.example.com/janus
+broadcastDataGuaranteed called without a publisher
+broadcastData called without a publisher
+pub waiting for sfu
+pub waiting for data channels & webrtcup
+Sending new offer for handle: n {session: r, id: 483089393870788}
+ICE state changed to connected
+pub waiting for join
+Sending new offer for handle: n {session: r, id: 483089393870788}
+publisher ready
+ICE state changed to connected
+new server time offset: -193.45ms
+```
