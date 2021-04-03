@@ -122,6 +122,15 @@ certificates: {
 }
 ```
 
+
+janus.plugin.sfu.cfg example:
+```
+[general]
+max_room_size = 15
+max_ccu = 1000
+message_threads = 3
+```
+
 and allow the UDP 51610-65535 on your server's firewall.
 
 If you want to start janus as a systemd service, look at https://github.com/meetecho/janus-gateway/pull/2591#issuecomment-812480322
