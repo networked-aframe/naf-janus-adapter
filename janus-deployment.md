@@ -13,6 +13,44 @@ Look at the changes in master or releases in the different repositories of the c
 
 Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [https://github.com/mozilla/janus-plugin-sfu.git](janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
 
+## automatic security upgrades with unattended-upgrades (optional)
+
+It depends of the security policy and machine image update policy you have.
+If you're using immutable machine image and redeploy image updates regularly,
+you can skip it. Otherwise I advice you to enable security updates automatically.
+This may be already configured or not based on the cloud provider you use.
+
+Install the packages:
+
+    apt install unattended-upgrades update-notifier-common
+
+Edit the file:
+
+    vi /etc/apt/apt.conf.d/50unattended-upgrades
+
+and configure:
+
+    Unattended-Upgrade::Automatic-Reboot "true";
+    Unattended-Upgrade::Automatic-Reboot-Time "08:00";
+
+Create the file:
+
+    vi /etc/apt/apt.conf.d/20auto-upgrades
+
+to add the following content:
+
+    APT::Periodic::Update-Package-Lists "1";
+    APT::Periodic::Unattended-Upgrade "1";
+
+This should get you covered, but please verify yourself some days later that
+the security updates are done! You can look at the file
+`/var/log/apt/history.log` to see if packages has been updated.
+
+Please note that the components you build in the next section are not covered
+by this automatic security updates, you will need to verify regularly yourself
+if there are security issues in those components, rebuild them and restart the
+service.
+
 ## Build it
 
 Here are the build instructions that produced a good working deployment at the
