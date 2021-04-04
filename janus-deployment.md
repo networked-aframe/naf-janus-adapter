@@ -13,6 +13,8 @@ Look at the changes in master or releases in the different repositories of the c
 
 Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [https://github.com/mozilla/janus-plugin-sfu.git](janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
 
+## Build it
+
 Here are the build instructions that produced a good working deployment at the
 time of writing this tutorial:
 
@@ -96,6 +98,8 @@ sudo cp /tmp/janus-plugin-sfu/target/release/libjanus_plugin_sfu.so "/usr/lib/ja
 sudo cp /tmp/janus-plugin-sfu/janus.plugin.sfu.cfg.example /usr/etc/janus/janus.plugin.sfu.cfg
 ```
 
+## Configure it
+
 janus.jcfg config file (keep the original but change these values):
 
 ```
@@ -151,30 +155,19 @@ max_ccu = 1000
 message_threads = 3
 ```
 
+## Security rules
+
 For GCP, you need to open 443 and the rtp port range 51610-65535 (UDP) in your security rules.
 
 For Scaleway, you need to expose 443 and have stateful security policy for the rtp port range to work.
 
+Add a DNS A record preprod.example.com to your public ip.
+
+## Verify janus is starting
+
 Now to test, in your ssh terminal run:
 
     janus
-
-If you want to start janus as a systemd service with a janus user
-look at https://github.com/meetecho/janus-gateway/pull/2591#issuecomment-812480322
-
-instructions not tested:
-
-```
-sudo -i
-addgroup --system janus
-adduser --system --home --shell /bin/false --no-create-home --ingroup janus --disabled-password --disabled-login janus
-vim /etc/systemd/system/janus.service # copy the content of the comment linked above
-systemctl daemon-reload
-# be sure to stop ctrl+c the previous janus launched before
-systemctl start janus
-systemctl status janus
-```
-
 
 When you start janus, with a working deployment you should have something like this:
 
@@ -226,6 +219,8 @@ Debug/log colors are enabled
 [Sat Apr  3 09:15:18 2021] JANUS WebSockets transport plugin initialized!
 [Sat Apr  3 09:15:18 2021] WebSockets thread started
 ```
+
+## nginx configuration
 
 Example of nginx conf:
 
@@ -296,6 +291,8 @@ websocket part is probably ok.
 In the nginx conf I gave above, in the /home/user/vr/public path (you can change that), put the html files from
 https://github.com/networked-aframe/naf-janus-adapter/tree/3.0.x/examples
 modify the janus url in the html files with wss://preprod.example.com/janus and you should be able to access the examples at https://preprod.example.com
+
+## Testing the example
 
 In browser logs you should see:
 
@@ -435,3 +432,48 @@ rtp port range.
 On Firefox, you can go to `about:webrtc` to see the ICE candidates.
 
 On Chrome: `chrome://webrtc-internals`
+
+## Start janus as a service
+
+To start janus when the machine boots up, you can start janus as a systemd service with a janus user.
+First log in as root:
+
+    sudo -i
+
+Create a file `/etc/systemd/system/janus.service` with this content:
+
+```
+[Unit]
+Description=Janus WebRTC Server
+Documentation=https://janus.conf.meetecho.com/
+After=network.target
+
+[Service]
+Type=forking
+User=janus
+ExecStart=/usr/bin/janus -ob --log-stdout
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Thanks to this [comment](https://github.com/meetecho/janus-gateway/pull/2591#issuecomment-812480322) for the example.
+
+And start the service like that (instructions not tested):
+
+```
+sudo -i
+addgroup --system janus
+adduser --system --home --shell /bin/false --no-create-home --ingroup janus --disabled-password --disabled-login janus
+systemctl daemon-reload # to take into account the /etc/systemd/system/janus.service file
+# be sure to stop ctrl+c the previous janus launched before
+systemctl start janus
+systemctl status janus
+```
+
+Logs will be in journald. (TODO add example how to consult them)
+To limit the logs that are kept, write for example `SystemMaxUse=100M` in `/etc/systemd/journald.conf`
+Use `journalctl --vacuum-size=100M` to force purging the logs now.
+More info on https://unix.stackexchange.com/questions/139513/how-to-clear-journalctl
