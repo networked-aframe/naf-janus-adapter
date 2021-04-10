@@ -108,7 +108,7 @@ apt-get -y --no-install-recommends install \
     python3-pip \
     python3-setuptools \
     python3-wheel && \
-apt-get remove -y libnice-dev libnice10 && \
+apt-get remove -y libnice-dev libnice10 meson && \
 apt-get install -y gtk-doc-tools libgnutls28-dev && \
 pip3 install meson && \
 git clone https://gitlab.freedesktop.org/libnice/libnice && \
