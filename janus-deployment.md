@@ -1,6 +1,6 @@
-# Janus deployment on Ubuntu 18.04
+# Janus deployment on Ubuntu 20.04
 
-This tutorial should work on Ubuntu 18.04 on a GCP instance or Scaleway instance.
+This tutorial should work on Ubuntu 20.04 on a GCP instance or Scaleway instance.
 
 You need to build from source several components: libwebsocket, libsrtp, libnice, usrsctp, janus-gateway and janus-plugin-sfu.
 
@@ -85,6 +85,7 @@ sudo apt-get -y update && apt-get install -y libmicrohttpd-dev \
     wget \
     sudo
 
+cd /tmp
 LIBWEBSOCKET="3.2.3" && wget https://github.com/warmcat/libwebsockets/archive/v$LIBWEBSOCKET.tar.gz && \
 tar xzvf v$LIBWEBSOCKET.tar.gz && \
 cd libwebsockets-$LIBWEBSOCKET && \
@@ -93,12 +94,14 @@ cd build && \
 cmake -DLWS_MAX_SMP=1 -DLWS_WITHOUT_EXTENSIONS=0 -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_C_FLAGS="-fpic" .. && \
 make && sudo make install
 
-SRTP="2.3.0" && apt-get remove -y libsrtp0-dev libsrtp0 && wget https://github.com/cisco/libsrtp/archive/v$SRTP.tar.gz && \
+cd /tmp
+SRTP="2.3.0" && wget https://github.com/cisco/libsrtp/archive/v$SRTP.tar.gz && \
 tar xfv v$SRTP.tar.gz && \
 cd libsrtp-$SRTP && \
 ./configure --prefix=/usr --enable-openssl && \
 make shared_library && sudo make install
 
+cd /tmp
 # libnice 2021-02-21 11:10 (post 0.1.18)
 apt-get -y --no-install-recommends install \
     ninja-build \
@@ -116,27 +119,30 @@ meson --prefix=/usr build && \
 ninja -C build && \
 sudo ninja -C build install
 
+cd /tmp
 # datachannel build
 # Jan 13, 2021 0.9.5.0 07f871bda23943c43c9e74cc54f25130459de830
-cd /tmp && git clone https://github.com/sctplab/usrsctp.git && cd /usrsctp && \
+git clone https://github.com/sctplab/usrsctp.git && cd usrsctp && \
 git checkout 0.9.5.0 && \
 ./bootstrap && \
 ./configure --prefix=/usr --disable-programs --disable-inet --disable-inet6 && \
 make && sudo make install
 
+cd /tmp
 # 2021-04-02 17:40 4dd379ab6952ccaaa027d5c150da1fbf0fecff16 (post v0.10.10)
-cd /tmp && git clone https://github.com/meetecho/janus-gateway.git && cd /tmp/janus-gateway && \
+git clone https://github.com/meetecho/janus-gateway.git && cd janus-gateway && \
 git checkout 4dd379ab6952ccaaa027d5c150da1fbf0fecff16 && \
 sh autogen.sh && \
 CFLAGS="${CFLAGS} -fno-omit-frame-pointer" ./configure --prefix=/usr \
 --disable-all-plugins --disable-all-handlers && \
 make && sudo make install && sudo make configs
 
-cd /tmp && git clone -b master https://github.com/mozilla/janus-plugin-sfu.git && cd /tmp/janus-plugin-sfu && \
+cd /tmp
+git clone -b master https://github.com/mozilla/janus-plugin-sfu.git && cd janus-plugin-sfu && \
 cargo build --release && \
-sudo mkdir -p "/usr/lib/janus/plugins" && \
-sudo mkdir -p "/usr/lib/janus/events" && \
-sudo cp /tmp/janus-plugin-sfu/target/release/libjanus_plugin_sfu.so "/usr/lib/janus/plugins" && \
+sudo mkdir -p /usr/lib/janus/plugins && \
+sudo mkdir -p /usr/lib/janus/events && \
+sudo cp /tmp/janus-plugin-sfu/target/release/libjanus_plugin_sfu.so /usr/lib/janus/plugins && \
 sudo cp /tmp/janus-plugin-sfu/janus.plugin.sfu.cfg.example /usr/etc/janus/janus.plugin.sfu.cfg
 ```
 
