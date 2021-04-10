@@ -65,9 +65,7 @@ time of writing this tutorial:
 ```
 sudo apt-get -y update && apt-get install -y libmicrohttpd-dev \
     libjansson-dev \
-    libnice-dev \
     libssl-dev \
-    libsrtp-dev \
     libglib2.0-dev \
     libopus-dev \
     libogg-dev \
