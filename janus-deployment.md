@@ -63,7 +63,7 @@ Here are the build instructions that produced a good working deployment at the
 time of writing this tutorial:
 
 ```
-sudo apt-get -y update && apt-get install -y libmicrohttpd-dev \
+sudo apt-get -y update && sudo apt-get install -y libmicrohttpd-dev \
     libjansson-dev \
     libssl-dev \
     libglib2.0-dev \
@@ -82,8 +82,7 @@ sudo apt-get -y update && apt-get install -y libmicrohttpd-dev \
     unzip \
     zip \
     cargo \
-    wget \
-    sudo
+    wget
 
 cd /tmp
 LIBWEBSOCKET="3.2.3" && wget https://github.com/warmcat/libwebsockets/archive/v$LIBWEBSOCKET.tar.gz && \
@@ -103,14 +102,14 @@ make shared_library && sudo make install
 
 cd /tmp
 # libnice 2021-02-21 11:10 (post 0.1.18)
-apt-get -y --no-install-recommends install \
+sudo apt-get -y --no-install-recommends install \
     ninja-build \
     python3 \
     python3-pip \
     python3-setuptools \
     python3-wheel && \
-apt-get remove -y libnice-dev libnice10 meson && \
-apt-get install -y gtk-doc-tools libgnutls28-dev && \
+sudo apt-get remove -y libnice-dev libnice10 meson && \
+sudo apt-get install -y gtk-doc-tools libgnutls28-dev && \
 pip3 install meson && \
 git clone https://gitlab.freedesktop.org/libnice/libnice && \
 cd libnice && \
