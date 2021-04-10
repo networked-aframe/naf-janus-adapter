@@ -11,9 +11,15 @@ Look at the [README history of janus-gateway](https://github.com/meetecho/janus-
 for some components changed, this happened several times. The build instructions below was up to date the Mar 25, 2021.
 Look at the changes in master or releases in the different repositories of the components you need to build to see if you can update them.
 
-Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [https://github.com/mozilla/janus-plugin-sfu.git](janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
+Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [https://github.com/mozilla/janus-plugin-sfu](janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
 
-## automatic security upgrades with unattended-upgrades (optional)
+Historical note: janus-gateway may change its API version and both [janus-plugin-rs](https://github.com/mozilla/janus-plugin-rs)
+(the C to Rust binding) and janus-plugin-sfu (Rust only) may need to be adapted.
+It was the case for the janus upgrade from 0.9.x to 0.10.x (api_version 14 to 15).
+You may look at the [PR #61](https://github.com/mozilla/janus-plugin-sfu/pull/61) for
+some pointers how to do that if you want to contribute the next needed upgrade.
+
+## Automatic security upgrades with unattended-upgrades (optional)
 
 It depends of the security policy and machine image update policy you have.
 If you're using immutable machine image and redeploy image updates regularly,
