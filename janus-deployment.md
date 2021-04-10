@@ -195,9 +195,9 @@ message_threads = 3
 
 ## Security rules
 
-For GCP, you need to open 443 and the rtp port range 51610-65535 (UDP) in your security rules.
+For GCP, you need to open 443 TCP and the rtp port range 51610-65535 UDP for Ingress and Egress in your firewall rules.
 
-For Scaleway, you need to expose 443 and have stateful security policy for the rtp port range to work.
+For Scaleway, you need to open 443 TCP and have a stateful security group for the rtp port range to work.
 
 Add a DNS A record preprod.example.com to your public ip.
 
