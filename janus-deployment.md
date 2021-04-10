@@ -515,3 +515,13 @@ Logs will be in journald. (TODO add example how to consult them)
 To limit the logs that are kept, write for example `SystemMaxUse=100M` in `/etc/systemd/journald.conf`
 Use `journalctl --vacuum-size=100M` to force purging the logs now.
 More info on https://unix.stackexchange.com/questions/139513/how-to-clear-journalctl
+
+## Docker deployment
+
+Not in the scope of this tutorial, but if you're interested in a docker or k8s
+deployment, you can easily create a Dockerfile from the commands of the "Build
+it" section above.
+
+You should watch this conference about janus docker deployment too:
+[Janus & Docker: friends or foe? Alessandro Amirante @ Meetecho](
+https://www.januscon.it/2019/talk.php?t=docker)
