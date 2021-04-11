@@ -2,7 +2,7 @@
 
 This tutorial should work on Ubuntu 20.04 on a GCP instance or Scaleway instance.
 
-You need to build from source several components: libwebsocket, libsrtp, libnice, usrsctp, janus-gateway and janus-plugin-sfu.
+You need to build from source several components: libwebsocket, libnice, usrsctp, janus-gateway and janus-plugin-sfu.
 
 You can follow the build instructions below but you should use latest versions if possible to have the latest security updates.
 This documentation won't necessary be updated.
