@@ -2,7 +2,7 @@
 
 This tutorial should work on Ubuntu 20.04 on a GCP instance or Scaleway instance.
 
-You need to build from source several components: libwebsocket, libnice, usrsctp, janus-gateway and janus-plugin-sfu.
+You need to build from source several components: libwebsocket, libsrtp, libnice, usrsctp, janus-gateway and janus-plugin-sfu.
 
 You can follow the build instructions below but you should use latest versions if possible to have the latest security updates.
 This documentation won't necessary be updated.
@@ -65,7 +65,6 @@ time of writing this tutorial:
 ```
 sudo apt-get -y update && sudo apt-get install -y libmicrohttpd-dev \
     libjansson-dev \
-    libsrtp2-dev \
     libssl-dev \
     libglib2.0-dev \
     libopus-dev \
@@ -93,6 +92,13 @@ mkdir build && \
 cd build && \
 cmake -DLWS_MAX_SMP=1 -DLWS_WITHOUT_EXTENSIONS=0 -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_C_FLAGS="-fpic" .. && \
 make && sudo make install
+
+cd /tmp
+SRTP="2.3.0" && wget https://github.com/cisco/libsrtp/archive/v$SRTP.tar.gz && \
+tar xfv v$SRTP.tar.gz && \
+cd libsrtp-$SRTP && \
+./configure --prefix=/usr --enable-openssl && \
+make shared_library && sudo make install
 
 cd /tmp
 # libnice 2021-02-21 11:10 (post 0.1.18)
