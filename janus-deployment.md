@@ -65,6 +65,7 @@ time of writing this tutorial:
 ```
 sudo apt-get -y update && sudo apt-get install -y libmicrohttpd-dev \
     libjansson-dev \
+    libsrtp2-dev \
     libssl-dev \
     libglib2.0-dev \
     libopus-dev \
@@ -94,23 +95,10 @@ cmake -DLWS_MAX_SMP=1 -DLWS_WITHOUT_EXTENSIONS=0 -DCMAKE_INSTALL_PREFIX:PATH=/us
 make && sudo make install
 
 cd /tmp
-SRTP="2.3.0" && wget https://github.com/cisco/libsrtp/archive/v$SRTP.tar.gz && \
-tar xfv v$SRTP.tar.gz && \
-cd libsrtp-$SRTP && \
-./configure --prefix=/usr --enable-openssl && \
-make shared_library && sudo make install
-
-cd /tmp
 # libnice 2021-02-21 11:10 (post 0.1.18)
-sudo apt-get -y --no-install-recommends install \
-    ninja-build \
-    python3 \
-    python3-pip \
-    python3-setuptools \
-    python3-wheel && \
-sudo apt-get remove -y libnice-dev libnice10 meson && \
+sudo apt-get -y --no-install-recommends install ninja-build meson && \
+sudo apt-get remove -y libnice-dev libnice10 && \
 sudo apt-get install -y gtk-doc-tools libgnutls28-dev && \
-pip3 install meson && \
 git clone https://gitlab.freedesktop.org/libnice/libnice && \
 cd libnice && \
 git checkout 36aa468c4916cfccd4363f0e27af19f2aeae8604 && \
