@@ -261,9 +261,31 @@ Debug/log colors are enabled
 [Sat Apr  3 09:15:18 2021] WebSockets thread started
 ```
 
+## download examples
+
+Connected as the ubuntu user:
+
+    git clone -b 3.0.x https://github.com/networked-aframe/naf-janus-adapter
+
+modify the janus url in the html files `naf-janus-adapter/examples` with wss://preprod.example.com/janus
+
 ## nginx configuration
 
-Example of nginx conf:
+Install nginx and certbot:
+
+    sudo apt-get install -y nginx python3-certbot-nginx
+
+Generate letsencrypt certificate first while you still have /etc/nginx/sites-enabled/default
+
+```
+certbot certonly --deploy-hook "nginx -s reload" --webroot -w /var/www/html -d preprod.example.com
+```
+
+Create the `/etc/nginx/dhparam.pem` file:
+
+    sudo curl --silent -o /etc/nginx/dhparam.pem https://ssl-config.mozilla.org/ffdhe2048.txt
+
+Create `/etc/nginx/sites-available/site`:
 
 ```
 server {
@@ -273,7 +295,7 @@ server {
   # allow letsencrypt
   location ~ /\.well-known {
     allow all;
-    root /var/www/webroot;
+    root /var/www/html;
     try_files $uri $uri/ =404;
   }
   return 301 https://preprod.example.com$request_uri;
@@ -284,11 +306,11 @@ server {
   listen      443 ssl http2;
   server_name preprod.example.com;
   keepalive_timeout   70;
-  root /home/user/vr/public;
+  root /home/ubuntu/naf-janus-adapter/examples;
   # allow letsencrypt
   location ~ /\.well-known {
     allow all;
-    root /var/www/webroot;
+    root /var/www/html;
     try_files $uri $uri/ =404;
   }
   location /janus {
@@ -300,7 +322,7 @@ server {
     proxy_cache_bypass $http_upgrade;
   }
   location / {
-    root /home/user/vr/public;
+    root /home/ubuntu/naf-janus-adapter/examples;
   }
   ssl_certificate /etc/letsencrypt/live/preprod.example.com/fullchain.pem;
   ssl_certificate_key /etc/letsencrypt/live/preprod.example.com/privkey.pem;
@@ -318,20 +340,20 @@ server {
 }
 ```
 
-Generate letsencrypt certificate
+In the nginx conf above, change the path /home/ubuntu/naf-janus-adapter/examples if necessary.
 
-```
-mkdir -p /var/www/webroot
-certbot certonly --deploy-hook "nginx -s reload" --webroot -w /var/www/webroot -d preprod.example.com
-```
+Enable the new config:
+
+    ln -s /etc/nginx/sites-available/site /etc/nginx/sites-enabled/site
+    rm /etc/nginx/sites-enabled/default
+    nginx -t
+    systemctl restart nginx
 
 You can do a quick check of your nginx conf
 If you go to https://preprod.example.com/janus and it shows 403, then the
 websocket part is probably ok.
 
-In the nginx conf I gave above, in the /home/user/vr/public path (you can change that), put the html files from
-https://github.com/networked-aframe/naf-janus-adapter/tree/3.0.x/examples
-modify the janus url in the html files with wss://preprod.example.com/janus and you should be able to access the examples at https://preprod.example.com
+Go to https://preprod.example.com to access the example.
 
 ## Testing the example
 
