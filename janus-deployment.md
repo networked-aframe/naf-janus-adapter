@@ -299,6 +299,7 @@ addgroup --system janus
 adduser --system --home / --shell /bin/false --no-create-home --ingroup janus --disabled-password --disabled-login janus
 systemctl daemon-reload # to take into account the /etc/systemd/system/janus.service file
 systemctl start janus
+systemctl enable janus
 systemctl status janus
 ```
 
