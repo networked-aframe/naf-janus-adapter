@@ -311,14 +311,23 @@ To limit the logs that are kept, write for example `SystemMaxUse=100M` in `/etc/
 Use `journalctl --vacuum-size=100M` to force purging the logs now.
 More info on https://unix.stackexchange.com/questions/139513/how-to-clear-journalctl
 
+## install nodejs LTS
+
+Install nodejs LTS (14.x) from https://github.com/nodesource/distributions
+
+Execute this:
+
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+
 ## download examples
 
 Connected as the ubuntu user:
 
-    git clone -b 3.0.x https://github.com/networked-aframe/naf-janus-adapter
+    git clone https://github.com/networked-aframe/naf-janus-adapter
     cd naf-janus-adapter
 
-Do a build if last build in the repo is not recent enough (optional):
+Do a build if last build in the repo is not recent enough:
 
     npm install
     npm run build
