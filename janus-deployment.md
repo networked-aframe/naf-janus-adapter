@@ -141,7 +141,7 @@ sudo cp /tmp/janus-plugin-sfu/janus.plugin.sfu.cfg.example /usr/etc/janus/janus.
 
 ## Configure it
 
-janus.jcfg config file (keep the original but change these values):
+`/usr/etc/janus/janus.jcfg` config file (keep the original but change these values):
 
 ```
 general: {
@@ -165,7 +165,7 @@ transports: {
 
 About the `session_timeout = 38` value, see [this discussion](https://github.com/mozilla/janus-plugin-sfu/pull/73#issuecomment-776649237).
 
-janus.transport.websockets.jcfg (these values only):
+`/usr/etc/janus/janus.transport.websockets.jcfg` config file (these values only):
 
 ```
 general: {
@@ -203,6 +203,7 @@ For GCP, you need to open 443 TCP and the rtp port range 51610-65535 UDP for Ing
 For Scaleway, you need to open 443 TCP and have a stateful security group for the rtp port range to work.
 
 Add a DNS A record preprod.example.com to your public ip.
+Of course modify preprod.example.com by a subdomain you own and replace it by your subdomain in the instructions and config files.
 
 ## Verify janus is starting
 
@@ -251,7 +252,7 @@ Debug/log colors are enabled
 [Sat Apr  3 09:15:18 2021] [WARN] Transport plugin 'libjanus_pfunix.so' has been disabled, skipping...
 [Sat Apr  3 09:15:18 2021] Loading transport plugin 'libjanus_http.so'...
 [Sat Apr  3 09:15:18 2021] HTTP transport timer started
-[Sat Apr  3 09:15:18 2021] Admin/monitor HTTP webserver started (port 7088, /admin path listener)...
+[Sat Apr  3 09:15:18 2021] Admin/monitor HTTP webserver started (port 8088, /admin path listener)...
 [Sat Apr  3 09:15:18 2021] JANUS REST (HTTP/HTTPS) transport plugin initialized!
 [Sat Apr  3 09:15:18 2021] Loading transport plugin 'libjanus_websockets.so'...
 [Sat Apr  3 09:15:18 2021] [WARN] libwebsockets has been built without IPv6 support, will bind to IPv4 only
@@ -261,13 +262,71 @@ Debug/log colors are enabled
 [Sat Apr  3 09:15:18 2021] WebSockets thread started
 ```
 
+stop it with ctrl+c
+
+## Start janus as a service
+
+To start janus when the machine boots up, you can start janus as a systemd service with a janus user.
+First log in as root:
+
+    sudo -i
+
+Create a file `/etc/systemd/system/janus.service` with this content:
+
+```
+[Unit]
+Description=Janus WebRTC Server
+Documentation=https://janus.conf.meetecho.com/
+After=network.target
+
+[Service]
+Type=forking
+User=janus
+ExecStart=/usr/bin/janus -ob --log-stdout
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Thanks to this [comment](https://github.com/meetecho/janus-gateway/pull/2591#issuecomment-812480322) for the example.
+
+And start the service like that:
+
+```
+addgroup --system janus
+adduser --system --home / --shell /bin/false --no-create-home --ingroup janus --disabled-password --disabled-login janus
+systemctl daemon-reload # to take into account the /etc/systemd/system/janus.service file
+systemctl start janus
+systemctl status janus
+```
+
+Logs will be in journald. To consult the logs:
+
+    journalctl -f -u janus.service --since today
+
+To limit the logs that are kept, write for example `SystemMaxUse=100M` in `/etc/systemd/journald.conf`
+Use `journalctl --vacuum-size=100M` to force purging the logs now.
+More info on https://unix.stackexchange.com/questions/139513/how-to-clear-journalctl
+
 ## download examples
 
 Connected as the ubuntu user:
 
     git clone -b 3.0.x https://github.com/networked-aframe/naf-janus-adapter
+    cd naf-janus-adapter
 
-modify the janus url in the html files `naf-janus-adapter/examples` with wss://preprod.example.com/janus
+Do a build if last build in the repo is not recent enough (optional):
+
+    npm install
+    npm run build
+
+Copy the dist folder in the examples folder so nginx can find it:
+
+    cp -rf dist examples/
+
+modify the serverURL url in the html file `examples/index.html` with `wss://preprod.example.com/janus`
 
 ## nginx configuration
 
@@ -275,11 +334,9 @@ Install nginx and certbot:
 
     sudo apt-get install -y nginx python3-certbot-nginx
 
-Generate letsencrypt certificate first while you still have /etc/nginx/sites-enabled/default
+Generate letsencrypt certificate first while you still have `/etc/nginx/sites-enabled/default`:
 
-```
-certbot certonly --deploy-hook "nginx -s reload" --webroot -w /var/www/html -d preprod.example.com
-```
+    sudo certbot certonly --deploy-hook "nginx -s reload" --webroot -w /var/www/html -d preprod.example.com
 
 Create the `/etc/nginx/dhparam.pem` file:
 
@@ -495,51 +552,6 @@ rtp port range.
 On Firefox, you can go to `about:webrtc` to see the ICE candidates.
 
 On Chrome: `chrome://webrtc-internals`
-
-## Start janus as a service
-
-To start janus when the machine boots up, you can start janus as a systemd service with a janus user.
-First log in as root:
-
-    sudo -i
-
-Create a file `/etc/systemd/system/janus.service` with this content:
-
-```
-[Unit]
-Description=Janus WebRTC Server
-Documentation=https://janus.conf.meetecho.com/
-After=network.target
-
-[Service]
-Type=forking
-User=janus
-ExecStart=/usr/bin/janus -ob --log-stdout
-Restart=on-failure
-LimitNOFILE=65536
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Thanks to this [comment](https://github.com/meetecho/janus-gateway/pull/2591#issuecomment-812480322) for the example.
-
-And start the service like that (instructions not tested):
-
-```
-sudo -i
-addgroup --system janus
-adduser --system --home --shell /bin/false --no-create-home --ingroup janus --disabled-password --disabled-login janus
-systemctl daemon-reload # to take into account the /etc/systemd/system/janus.service file
-# be sure to stop ctrl+c the previous janus launched before
-systemctl start janus
-systemctl status janus
-```
-
-Logs will be in journald. (TODO add example how to consult them)
-To limit the logs that are kept, write for example `SystemMaxUse=100M` in `/etc/systemd/journald.conf`
-Use `journalctl --vacuum-size=100M` to force purging the logs now.
-More info on https://unix.stackexchange.com/questions/139513/how-to-clear-journalctl
 
 ## Docker deployment
 
