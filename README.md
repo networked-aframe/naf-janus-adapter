@@ -90,4 +90,5 @@ scene.addEventListener('adapter-ready', ({ detail: adapter }) => {
 
 ## Janus SFU deployment
 
-[how to deploy janus with the janus sfu plugin on Ubuntu 20.04](docs/janus-deployment.md)
+- [How to deploy janus with the janus sfu plugin on Ubuntu 20.04](docs/janus-deployment.md)
+- [Securing janus with JWT](docs/securing-janus-with-jwt.md)
