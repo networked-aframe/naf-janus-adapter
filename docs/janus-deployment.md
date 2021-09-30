@@ -277,7 +277,8 @@ Create a file `/etc/systemd/system/janus.service` with this content:
 [Unit]
 Description=Janus WebRTC Server
 Documentation=https://janus.conf.meetecho.com/
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=forking
