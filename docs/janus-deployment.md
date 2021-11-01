@@ -11,7 +11,7 @@ Look at the [README history of janus-gateway](https://github.com/meetecho/janus-
 for some components changed, this happened several times. The build instructions below was up to date the Mar 25, 2021.
 Look at the changes in master or releases in the different repositories of the components you need to build to see if you can update them.
 
-Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [https://github.com/mozilla/janus-plugin-sfu](janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
+Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [janus-plugin-sfu](https://github.com/mozilla/janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
 
 Historical note: janus-gateway may change its API version and both [janus-plugin-rs](https://github.com/mozilla/janus-plugin-rs)
 (the C to Rust binding) and janus-plugin-sfu (Rust only) may need to be adapted.
