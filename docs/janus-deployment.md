@@ -8,7 +8,7 @@ You can follow the build instructions below but you should use latest versions i
 This documentation won't necessary be updated.
 
 Look at the [README history of janus-gateway](https://github.com/meetecho/janus-gateway/commits/master/README.md) to see if the build instructions
-for some components changed, this happened several times. The build instructions below was up to date the Mar 25, 2021.
+for some components changed, this happened several times. The build instructions below was up to date the 2022-01-22.
 Look at the changes in master or releases in the different repositories of the components you need to build to see if you can update them.
 
 Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [janus-plugin-sfu](https://github.com/mozilla/janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
@@ -18,6 +18,10 @@ Historical note: janus-gateway may change its API version and both [janus-plugin
 It was the case for the janus upgrade from 0.9.x to 0.10.x (api_version 14 to 15).
 You may look at the [PR #61](https://github.com/mozilla/janus-plugin-sfu/pull/61) for
 some pointers how to do that if you want to contribute the next needed upgrade.
+
+Please note that janus-gateway master since 2022-02-11 changed to include the multistream changes ([PR-2211 multistream](https://github.com/meetecho/janus-gateway/pull/2211) was merged). The janus-plugin-sfu Rust code is currently working with the [janus-gateway 0.x branch](https://github.com/meetecho/janus-gateway/tree/0.x)
+
+There is an API change 15 to 16 in this commit https://github.com/meetecho/janus-gateway/commit/f9906da03e011d6ac457d49a3b5473c320b01e6e (release v0.11.6) that is not currently addressed in janus-plugin-rs and janus-plugin-sfu. You can use janus-gateway 0.x branch and revert this commit to come back to API 15, janus-plugin-sfu will work fine in this case.
 
 ## Automatic security upgrades with unattended-upgrades (optional)
 
@@ -122,9 +126,12 @@ git checkout 0.9.5.0 && \
 make && sudo make install
 
 cd /tmp
-# 2021-04-06 12:36 d52e33259de3088ff964440fafd17ca58f8ba9bc (v0.11.1)
-git clone https://github.com/meetecho/janus-gateway.git && cd janus-gateway && \
-git checkout d52e33259de3088ff964440fafd17ca58f8ba9bc && \
+# 2022-01-10 14:07 ee5807affd985537380d00c7d70ca7ddf31a3d30 (post v0.11.6) from 0.x branch
+# with https://github.com/meetecho/janus-gateway/commit/f9906da03e011d6ac457d49a3b5473c320b01e6e reverted to come back to api 15
+# git clone https://github.com/meetecho/janus-gateway.git && \
+git clone -b 0.x-api15 https://github.com/vincentfretin/janus-gateway.git && \
+cd janus-gateway && \
+git checkout b4c025ffee49b12e51f849ecaf7904ba4bd3ecc6 && \
 sh autogen.sh && \
 CFLAGS="${CFLAGS} -fno-omit-frame-pointer" ./configure --prefix=/usr \
 --disable-all-plugins --disable-all-handlers && \
@@ -152,6 +159,7 @@ general: {
 }
 media: {
   rtp_port_range = "51610-65535"
+  slowlink_threshold = 4  # default to 0 (disabled) post v0.11.6, put it back to 4 if you want to have logs and events to know that a participant lost packets
 }
 nat: {
   nice_debug = false  # set it to true to have more logs
