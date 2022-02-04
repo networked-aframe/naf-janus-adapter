@@ -126,12 +126,12 @@ git checkout 0.9.5.0 && \
 make && sudo make install
 
 cd /tmp
-# 2022-01-10 14:07 ee5807affd985537380d00c7d70ca7ddf31a3d30 (post v0.11.6) from 0.x branch
+# 2022-01-24 15:22 561b5d341a317abbbbcaa19eb4c89fb871dd1e4b (v0.11.7) from 0.x branch
 # with https://github.com/meetecho/janus-gateway/commit/f9906da03e011d6ac457d49a3b5473c320b01e6e reverted to come back to api 15
 # git clone https://github.com/meetecho/janus-gateway.git && \
 git clone -b 0.x-api15 https://github.com/vincentfretin/janus-gateway.git && \
 cd janus-gateway && \
-git checkout b4c025ffee49b12e51f849ecaf7904ba4bd3ecc6 && \
+git checkout 372ab47789c64ae8a13bd0f38237777c8edbdf0b && \
 sh autogen.sh && \
 CFLAGS="${CFLAGS} -fno-omit-frame-pointer" ./configure --prefix=/usr \
 --disable-all-plugins --disable-all-handlers && \
