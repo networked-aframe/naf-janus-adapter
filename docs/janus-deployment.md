@@ -11,7 +11,7 @@ Look at the [README history of janus-gateway](https://github.com/meetecho/janus-
 for some components changed, this happened several times. The build instructions below was up to date the 2022-01-22.
 Look at the changes in master or releases in the different repositories of the components you need to build to see if you can update them.
 
-Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [janus-plugin-sfu](https://github.com/mozilla/janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
+Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [janus-plugin-sfu](https://github.com/networked-aframe/janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
 
 Historical note: janus-gateway may change its API version and both [janus-plugin-rs](https://github.com/mozilla/janus-plugin-rs)
 (the C to Rust binding) and janus-plugin-sfu (Rust only) may need to be adapted.
@@ -138,7 +138,7 @@ CFLAGS="${CFLAGS} -fno-omit-frame-pointer" ./configure --prefix=/usr \
 make && sudo make install && sudo make configs
 
 cd /tmp
-git clone -b master https://github.com/mozilla/janus-plugin-sfu.git && cd janus-plugin-sfu && \
+git clone -b master https://github.com/networked-aframe/janus-plugin-sfu.git && cd janus-plugin-sfu && \
 cargo build --release && \
 sudo mkdir -p /usr/lib/janus/plugins && \
 sudo mkdir -p /usr/lib/janus/events && \
