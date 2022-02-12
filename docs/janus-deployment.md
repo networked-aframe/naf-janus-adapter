@@ -8,16 +8,22 @@ You can follow the build instructions below but you should use latest versions i
 This documentation won't necessary be updated.
 
 Look at the [README history of janus-gateway](https://github.com/meetecho/janus-gateway/commits/master/README.md) to see if the build instructions
-for some components changed, this happened several times. The build instructions below was up to date the Mar 25, 2021.
+for some components changed, this happened several times. The build instructions below was up to date the 2022-02-12.
 Look at the changes in master or releases in the different repositories of the components you need to build to see if you can update them.
 
-Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [janus-plugin-sfu](https://github.com/mozilla/janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
+Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [janus-plugin-sfu](https://github.com/networked-aframe/janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
 
 Historical note: janus-gateway may change its API version and both [janus-plugin-rs](https://github.com/mozilla/janus-plugin-rs)
 (the C to Rust binding) and janus-plugin-sfu (Rust only) may need to be adapted.
 It was the case for the janus upgrade from 0.9.x to 0.10.x (api_version 14 to 15).
 You may look at the [PR #61](https://github.com/mozilla/janus-plugin-sfu/pull/61) for
 some pointers how to do that if you want to contribute the next needed upgrade.
+Another example is the update to api_version 16 (janus 0.11.6), see
+[janus-plugin-rs PR #31](https://github.com/mozilla/janus-plugin-rs/pull/31) and
+[networked-aframe/janus-plugin-sfu PR #1](https://github.com/networked-aframe/janus-plugin-sfu/pull/1)
+
+Please note that janus-gateway master since 2022-02-11 changed to include the multistream changes ([PR-2211 multistream](https://github.com/meetecho/janus-gateway/pull/2211) was merged, [see the post](https://www.meetecho.com/blog/multistream/)).
+The janus-plugin-sfu Rust code is currently working with the [janus-gateway 0.x branch](https://github.com/meetecho/janus-gateway/tree/0.x)
 
 ## Automatic security upgrades with unattended-upgrades (optional)
 
@@ -122,16 +128,17 @@ git checkout 0.9.5.0 && \
 make && sudo make install
 
 cd /tmp
-# 2021-04-06 12:36 d52e33259de3088ff964440fafd17ca58f8ba9bc (v0.11.1)
-git clone https://github.com/meetecho/janus-gateway.git && cd janus-gateway && \
-git checkout d52e33259de3088ff964440fafd17ca58f8ba9bc && \
+# 2022-02-11 10:26 8b9e96eb9e9db2f6a4b1507b02c79ffc7bcf0f0c (v0.11.8 from 0.x branch)
+git clone -b 0.x https://github.com/meetecho/janus-gateway.git && \
+cd janus-gateway && \
+git checkout 8b9e96eb9e9db2f6a4b1507b02c79ffc7bcf0f0c && \
 sh autogen.sh && \
 CFLAGS="${CFLAGS} -fno-omit-frame-pointer" ./configure --prefix=/usr \
 --disable-all-plugins --disable-all-handlers && \
 make && sudo make install && sudo make configs
 
 cd /tmp
-git clone -b master https://github.com/mozilla/janus-plugin-sfu.git && cd janus-plugin-sfu && \
+git clone -b master https://github.com/networked-aframe/janus-plugin-sfu.git && cd janus-plugin-sfu && \
 cargo build --release && \
 sudo mkdir -p /usr/lib/janus/plugins && \
 sudo mkdir -p /usr/lib/janus/events && \
@@ -152,6 +159,7 @@ general: {
 }
 media: {
   rtp_port_range = "51610-65535"
+  slowlink_threshold = 4  # default to 0 (disabled) in v0.11.7, put it back to 4 if you want to have logs and events to know that a participant lost packets
 }
 nat: {
   nice_debug = false  # set it to true to have more logs
