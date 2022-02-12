@@ -8,7 +8,7 @@ You can follow the build instructions below but you should use latest versions i
 This documentation won't necessary be updated.
 
 Look at the [README history of janus-gateway](https://github.com/meetecho/janus-gateway/commits/master/README.md) to see if the build instructions
-for some components changed, this happened several times. The build instructions below was up to date the 2022-01-22.
+for some components changed, this happened several times. The build instructions below was up to date the 2022-02-12.
 Look at the changes in master or releases in the different repositories of the components you need to build to see if you can update them.
 
 Follow at least the [janus-gateway](https://github.com/meetecho/janus-gateway) and the [janus-plugin-sfu](https://github.com/networked-aframe/janus-plugin-sfu) repositories and the [janus mailing-list](https://groups.google.com/g/meetecho-janus) for updates.
