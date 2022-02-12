@@ -159,7 +159,7 @@ general: {
 }
 media: {
   rtp_port_range = "51610-65535"
-  slowlink_threshold = 4  # default to 0 (disabled) post v0.11.6, put it back to 4 if you want to have logs and events to know that a participant lost packets
+  slowlink_threshold = 4  # default to 0 (disabled) in v0.11.7, put it back to 4 if you want to have logs and events to know that a participant lost packets
 }
 nat: {
   nice_debug = false  # set it to true to have more logs
