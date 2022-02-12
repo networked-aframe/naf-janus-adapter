@@ -77,3 +77,8 @@ NAF.connection.adapter.syncOccupants(NAF.connection.adapter.availableOccupants);
 - Dev: `npm run start`
 - Build: `npm run build`
 - Release: `npm run release`
+
+## Janus SFU deployment
+
+- [How to deploy janus with the janus sfu plugin on Ubuntu 20.04](https://github.com/networked-aframe/naf-janus-adapter/blob/master/docs/janus-deployment.md)
+- [Securing janus with JWT](https://github.com/networked-aframe/naf-janus-adapter/blob/master/docs/securing-janus-with-jwt.md)
