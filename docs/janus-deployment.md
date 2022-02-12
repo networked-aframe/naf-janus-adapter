@@ -19,7 +19,8 @@ It was the case for the janus upgrade from 0.9.x to 0.10.x (api_version 14 to 15
 You may look at the [PR #61](https://github.com/mozilla/janus-plugin-sfu/pull/61) for
 some pointers how to do that if you want to contribute the next needed upgrade.
 
-Please note that janus-gateway master since 2022-02-11 changed to include the multistream changes ([PR-2211 multistream](https://github.com/meetecho/janus-gateway/pull/2211) was merged). The janus-plugin-sfu Rust code is currently working with the [janus-gateway 0.x branch](https://github.com/meetecho/janus-gateway/tree/0.x)
+Please note that janus-gateway master since 2022-02-11 changed to include the multistream changes ([PR-2211 multistream](https://github.com/meetecho/janus-gateway/pull/2211) was merged, [see the post](https://www.meetecho.com/blog/multistream/)).
+The janus-plugin-sfu Rust code is currently working with the [janus-gateway 0.x branch](https://github.com/meetecho/janus-gateway/tree/0.x)
 
 There is an API change 15 to 16 in this commit https://github.com/meetecho/janus-gateway/commit/f9906da03e011d6ac457d49a3b5473c320b01e6e (release v0.11.6) that is not currently addressed in janus-plugin-rs and janus-plugin-sfu. You can use janus-gateway 0.x branch and revert this commit to come back to API 15, janus-plugin-sfu will work fine in this case.
 
