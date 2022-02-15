@@ -18,8 +18,8 @@ naf-janus-adapter should support anything that supports recent WebRTC standards 
 <html>
 <head>
   <script src="https://webrtc.github.io/adapter/adapter-latest.js" crossorigin="anonymous"></script>
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/gh/networked-aframe/networked-aframe@master/dist/networked-aframe.min.js" crossorigin="anonymous"></script>
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/networked-aframe@^0.9.0/dist/networked-aframe.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/gh/networked-aframe/naf-janus-adapter@3.0.x/dist/naf-janus-adapter.min.js"></script>
 </head>
 <body>
