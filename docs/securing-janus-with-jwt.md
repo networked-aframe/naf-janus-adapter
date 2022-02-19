@@ -6,7 +6,7 @@ You'll find in this document some notes on how to secure the access to the rooms
 
 Generate a private/public key:
 
-    ssh-keygen -t rsa -b 2048 -f key.pem -N ''
+    ssh-keygen -t rsa -b 2048 -f key.pem -N '' -m pem
     openssl rsa -in key.pem -outform PEM -pubout -out public.pem
     openssl rsa -in key.pem -outform DER -out key.der
     openssl rsa -in key.der -inform DER -RSAPublicKey_out -outform DER -out public.der
