@@ -121,7 +121,8 @@ sudo ninja -C build install
 cd /tmp
 # datachannel build
 # Jan 13, 2021 0.9.5.0 07f871bda23943c43c9e74cc54f25130459de830
-git clone https://github.com/sctplab/usrsctp.git && cd usrsctp && \
+git clone https://github.com/sctplab/usrsctp.git && \
+cd usrsctp && \
 git checkout 0.9.5.0 && \
 ./bootstrap && \
 ./configure --prefix=/usr --disable-programs --disable-inet --disable-inet6 && \
