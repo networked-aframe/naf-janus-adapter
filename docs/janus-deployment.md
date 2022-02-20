@@ -65,6 +65,9 @@ service.
 
 ## Build it
 
+Note: If you want to use a docker container instead, look at the end of this
+documentation.
+
 Here are the build instructions that produced a good working deployment at the
 time of writing this tutorial:
 
@@ -575,10 +578,7 @@ On Chrome: `chrome://webrtc-internals`
 
 ## Docker deployment
 
-Not in the scope of this tutorial, but if you're interested in a docker or k8s
-deployment, you can easily create a Dockerfile from the commands of the "Build
-it" section above.
+See the [Dockerfile in the janus-plugin-sfu repository](https://github.com/networked-aframe/janus-plugin-sfu/tree/master/docker)
 
 You should watch this conference about janus docker deployment too:
-[Janus & Docker: friends or foe? Alessandro Amirante @ Meetecho](
-https://www.januscon.it/2019/talk.php?t=docker)
+[Janus & Docker: friends or foe? Alessandro Amirante @ Meetecho](https://www.januscon.it/2019/talk.php?t=docker)
