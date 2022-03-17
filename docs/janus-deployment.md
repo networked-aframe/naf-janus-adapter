@@ -132,10 +132,10 @@ git checkout 0.9.5.0 && \
 make && sudo make install
 
 cd /tmp
-# 2022-02-11 10:26 8b9e96eb9e9db2f6a4b1507b02c79ffc7bcf0f0c (v0.11.8 from 0.x branch)
+# 2022-02-18 15:38 24ec58f4e9b16557f27b15b7a6afa23abbf39c45 (post v0.11.8 from 0.x branch)
 git clone -b 0.x https://github.com/meetecho/janus-gateway.git && \
 cd janus-gateway && \
-git checkout 8b9e96eb9e9db2f6a4b1507b02c79ffc7bcf0f0c && \
+git checkout 24ec58f4e9b16557f27b15b7a6afa23abbf39c45 && \
 sh autogen.sh && \
 CFLAGS="${CFLAGS} -fno-omit-frame-pointer" ./configure --prefix=/usr \
 --disable-all-plugins --disable-all-handlers && \
