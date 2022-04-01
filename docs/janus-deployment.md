@@ -293,17 +293,15 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-Type=forking
+Type=simple
 User=janus
-ExecStart=/usr/bin/janus -ob --log-stdout
-Restart=on-failure
+ExecStart=/usr/bin/janus -o
+Restart=on-abnormal
 LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
 ```
-
-Thanks to this [comment](https://github.com/meetecho/janus-gateway/pull/2591#issuecomment-812480322) for the example.
 
 And start the service like that:
 
