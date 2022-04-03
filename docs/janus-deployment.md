@@ -293,17 +293,15 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-Type=forking
+Type=simple
 User=janus
-ExecStart=/usr/bin/janus -ob --log-stdout
-Restart=on-failure
+ExecStart=/usr/bin/janus -o
+Restart=on-abnormal
 LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
 ```
-
-Thanks to this [comment](https://github.com/meetecho/janus-gateway/pull/2591#issuecomment-812480322) for the example.
 
 And start the service like that:
 
@@ -323,6 +321,82 @@ Logs will be in journald. To consult the logs:
 To limit the logs that are kept, write for example `SystemMaxUse=100M` in `/etc/systemd/journald.conf`
 Use `journalctl --vacuum-size=100M` to force purging the logs now.
 More info on https://unix.stackexchange.com/questions/139513/how-to-clear-journalctl
+
+## Tuning janus for high load
+
+LimitNOFILE (max number of open files) in the unit file is important here. If you run janus on the command line or without this option in the unit file, this defaults to 1024. This is not enough and janus will crash at one point with the error `Too many open files`.
+This is documented in the [FAQ](https://janus.conf.meetecho.com/docs/FAQ.html#ulimit).
+You can verify this with the `prlimit` command.
+
+janus started via systemd:
+```
+$ ps aux |grep janus
+janus        890  0.3  0.1 551468 11232 ?        Ssl  06:00   1:34 /usr/bin/janus -o
+$ sudo prlimit -p 890
+RESOURCE   DESCRIPTION                             SOFT      HARD UNITS
+AS         address space limit                unlimited unlimited bytes
+CORE       max core file size                 unlimited unlimited bytes
+CPU        CPU time                           unlimited unlimited seconds
+DATA       max data size                      unlimited unlimited bytes
+FSIZE      max file size                      unlimited unlimited bytes
+LOCKS      max number of file locks held      unlimited unlimited locks
+MEMLOCK    max locked-in-memory address space     65536     65536 bytes
+MSGQUEUE   max bytes in POSIX mqueues            819200    819200 bytes
+NICE       max nice prio allowed to raise             0         0
+NOFILE     max number of open files               65536     65536 files
+NPROC      max number of processes                31678     31678 processes
+RSS        max resident set size              unlimited unlimited bytes
+RTPRIO     max real-time priority                     0         0
+RTTIME     timeout for real-time tasks        unlimited unlimited microsecs
+SIGPENDING max number of pending signals          31678     31678 signals
+STACK      max stack size                       8388608 unlimited bytes
+```
+
+If LimitNOFILE is not specified (only showing what changed compared to the first output):
+```
+NOFILE     max number of open files                1024    524288 files
+NPROC      max number of processes                31678     31678 processes
+```
+
+janus started via docker:
+```
+$ ps aux|grep janus
+nobody    110974  0.7  0.3 843376 29640 ?        Ssl  14:01   0:00 janus
+$ sudo prlimit -p 110974
+RESOURCE   DESCRIPTION                             SOFT      HARD UNITS
+NOFILE     max number of open files             1048576   1048576 files
+NPROC      max number of processes            unlimited unlimited processes
+```
+
+Another important config is the number of threads.
+Number of tasks (threads) by default is limited to 9503.
+
+```
+systemctl status janus
+● janus.service - Janus WebRTC Server
+     Loaded: loaded (/etc/systemd/system/janus.service; enabled; vendor preset: enabled)
+     Active: active (running) since Fri 2022-04-01 14:50:53 UTC; 30min ago
+       Docs: https://janus.conf.meetecho.com/
+   Main PID: 122620 (janus)
+      Tasks: 10 (limit: 9503)
+     Memory: 3.0M
+     CGroup: /system.slice/janus.service
+             └─122620 /usr/bin/janus -o
+```
+
+You could add `TasksMax=infinity` in the unit file (found it at https://groups.google.com/g/meetecho-janus/c/XHh_uB-hMNI/m/uNvpLsBfEAAJ) to remove the limit to avoid a crash if janus creates too many threads. If you look at the `systemctl status janus` again after doing the change, the `(limit: 9503)` will be gone.
+But it may not be the right thing to do actually if you want to achieve good performance, but it may depends on your usage, so choose that or the solution below after testing that yourself.
+
+There seems to have a minimum of 10 tasks when janus just started and no users. Then there is one task created for each RTCPeerConnection created (janus handle) if you don't have the `event_loops` option set in `/usr/etc/janus/janus.jcfg`.
+With the current version of the Rust janus sfu, a RTCPeerConnection is created to subscribe to each participant, so number of sessions (janus handle) in a room is (number of users)^2, so 9503 can be reached quickly, about 24 rooms of 20 users, or 43 rooms of 15 users. The server needs to support it in terms of CPU, memory and bandwidth of course.
+With so many threads, you'll probably have bad performance because of [context switching](https://en.wikipedia.org/wiki/Context_switch).
+From `janus.jcfg` about the `event_loops` option:
+```
+By default, Janus handles each have their own event loop and related thread for all the media routing and management. If for some reason you'd rather limit the number of loop/threads, and you want handles to share those, you can do that configuring the event_loops property: this will spawn the specified amount of threads at startup, run a separate event loop on each of them, and add new handles to one of them when attaching. Notice that, while cutting the number of threads and possibly reducing context switching, this might have an impact on the media delivery, especially if the available loops can't take care of all the handles and their media in time. As such, if you want to use this you should provision the correct value according to the available resources (e.g., CPUs available).
+```
+
+If you set `event_loops=8` corresponding to the number of available CPUs, you will have right away a minimum number of 18 tasks. When there is one user in a room, there is an extra task created, we are at 19 tasks, but after that any number of participants that connect to any room, there would be still 19 tasks, no more.
+You can see the janus threads with the `htop` command and then press F5 to show processes as a tree.
 
 ## install nodejs LTS
 
