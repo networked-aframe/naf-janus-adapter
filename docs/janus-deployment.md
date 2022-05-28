@@ -443,8 +443,8 @@ Create `/etc/nginx/sites-available/site`:
 
 ```
 server {
-  listen      [::]:80;
-  listen      80;
+  listen      80 default_server;
+  listen      [::]:80 default_server;
   server_name preprod.example.com;
   # allow letsencrypt
   location ~ /\.well-known {
@@ -452,15 +452,16 @@ server {
     root /var/www/html;
     try_files $uri $uri/ =404;
   }
-  return 301 https://preprod.example.com$request_uri;
+  location / {
+    return 301 https://$host$request_uri;
+  }
 }
 
 server {
-  listen      [::]:443 ssl http2;
   listen      443 ssl http2;
+  listen      [::]:443 ssl http2;
   server_name preprod.example.com;
   keepalive_timeout   70;
-  root /home/ubuntu/naf-janus-adapter/examples;
   # allow letsencrypt
   location ~ /\.well-known {
     allow all;
@@ -478,17 +479,26 @@ server {
   location / {
     root /home/ubuntu/naf-janus-adapter/examples;
   }
+
+  # https://ssl-config.mozilla.org/#server=nginx&version=1.17.7&config=modern&openssl=1.1.1k&guideline=5.6
   ssl_certificate /etc/letsencrypt/live/preprod.example.com/fullchain.pem;
   ssl_certificate_key /etc/letsencrypt/live/preprod.example.com/privkey.pem;
   ssl_session_timeout 1d;
   ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
-  ssl_session_tickets off;  # curl https://ssl-config.mozilla.org/ffdhe2048.txt > /etc/nginx/dhparam.pem
-  ssl_dhparam /etc/nginx/dhparam.pem;  # see https://ssl-config.mozilla.org/#server=nginx&server-version=1.14.0&config=intermediate
-  ssl_protocols TLSv1.2 TLSv1.3;
-  ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-  ssl_prefer_server_ciphers off;  # HSTS (ngx_http_headers_module is required) (15768000 seconds = 6 months)
-  add_header Strict-Transport-Security max-age=15768000;  ssl_stapling on;
+  ssl_session_tickets off;
+
+  # modern configuration
+  ssl_protocols TLSv1.3;
+  ssl_prefer_server_ciphers off;
+
+  # HSTS (ngx_http_headers_module is required) (63072000 seconds)
+  add_header Strict-Transport-Security "max-age=63072000" always;
+
+  # OCSP stapling
+  ssl_stapling on;
   ssl_stapling_verify on;
+
+  # verify chain of trust of OCSP response using Root CA and Intermediate certs
   ssl_trusted_certificate /etc/letsencrypt/live/preprod.example.com/chain.pem;
   resolver 8.8.8.8 8.8.4.4;
 }
