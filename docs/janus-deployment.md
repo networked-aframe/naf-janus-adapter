@@ -400,7 +400,7 @@ You can see the janus threads with the `htop` command and then press F5 to show 
 
 ## install nodejs LTS
 
-Install nodejs LTS (14.x) from https://github.com/nodesource/distributions
+Install nodejs LTS from https://github.com/nodesource/distributions
 
 Execute this:
 
@@ -434,10 +434,6 @@ Install nginx and certbot:
 Generate letsencrypt certificate first while you still have `/etc/nginx/sites-enabled/default`:
 
     sudo certbot certonly --deploy-hook "nginx -s reload" --webroot -w /var/www/html -d preprod.example.com
-
-Create the `/etc/nginx/dhparam.pem` file:
-
-    sudo curl --silent -o /etc/nginx/dhparam.pem https://ssl-config.mozilla.org/ffdhe2048.txt
 
 Create `/etc/nginx/sites-available/site`:
 
