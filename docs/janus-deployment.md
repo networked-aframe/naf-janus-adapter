@@ -94,7 +94,7 @@ sudo apt-get -y update && sudo apt-get install -y libmicrohttpd-dev \
     wget
 
 cd /tmp
-LIBWEBSOCKET="3.2.3" && wget https://github.com/warmcat/libwebsockets/archive/v$LIBWEBSOCKET.tar.gz && \
+LIBWEBSOCKET="4.3.2" && wget https://github.com/warmcat/libwebsockets/archive/v$LIBWEBSOCKET.tar.gz && \
 tar xzvf v$LIBWEBSOCKET.tar.gz && \
 cd libwebsockets-$LIBWEBSOCKET && \
 mkdir build && \
@@ -103,7 +103,7 @@ cmake -DLWS_MAX_SMP=1 -DLWS_WITHOUT_EXTENSIONS=0 -DCMAKE_INSTALL_PREFIX:PATH=/us
 make && sudo make install
 
 cd /tmp
-SRTP="2.3.0" && wget https://github.com/cisco/libsrtp/archive/v$SRTP.tar.gz && \
+SRTP="2.4.2" && wget https://github.com/cisco/libsrtp/archive/v$SRTP.tar.gz && \
 tar xfv v$SRTP.tar.gz && \
 cd libsrtp-$SRTP && \
 ./configure --prefix=/usr --enable-openssl && \
