@@ -458,12 +458,6 @@ server {
   listen      [::]:443 ssl http2;
   server_name preprod.example.com;
   keepalive_timeout   70;
-  # allow letsencrypt
-  location ~ /\.well-known {
-    allow all;
-    root /var/www/html;
-    try_files $uri $uri/ =404;
-  }
   location /janus {
     proxy_pass http://127.0.0.1:8188;
     proxy_http_version 1.1;
