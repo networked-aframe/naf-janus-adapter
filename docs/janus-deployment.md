@@ -503,9 +503,10 @@ Enable the new config:
     nginx -t
     systemctl restart nginx
 
-You can do a quick check of your nginx conf
-If you go to https://preprod.example.com/janus and it shows 403, then the
-websocket part is probably ok.
+You can do a quick check of your nginx conf.
+If you go to https://preprod.example.com/janus and it shows the "403" number on the
+top left, it means the request reached janus, then the websocket part will probably be ok.
+If you get a 403 with an additional message, then you have an issue with your nginx conf.
 
 Go to https://preprod.example.com to access the example.
 
