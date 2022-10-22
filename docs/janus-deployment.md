@@ -132,17 +132,19 @@ git checkout 0.9.5.0 && \
 make && sudo make install
 
 cd /tmp
-# 2022-02-18 15:38 24ec58f4e9b16557f27b15b7a6afa23abbf39c45 (post v0.11.8 from 0.x branch)
+# 2022-10-21 15:02 7b6bcdcdbe02dd05932d778592f4c03604a83684 (post v0.13.0 from 0.x branch)
 git clone -b 0.x https://github.com/meetecho/janus-gateway.git && \
 cd janus-gateway && \
-git checkout 24ec58f4e9b16557f27b15b7a6afa23abbf39c45 && \
+git checkout 7b6bcdcdbe02dd05932d778592f4c03604a83684 && \
 sh autogen.sh && \
 CFLAGS="${CFLAGS} -fno-omit-frame-pointer" ./configure --prefix=/usr \
 --disable-all-plugins --disable-all-handlers && \
 make && sudo make install && sudo make configs
 
 cd /tmp
-git clone -b master https://github.com/networked-aframe/janus-plugin-sfu.git && cd janus-plugin-sfu && \
+git clone -b master https://github.com/networked-aframe/janus-plugin-sfu.git && \
+cd janus-plugin-sfu && \
+git checkout 1914dfa7e22c793f4a684ebeb002304661270519 && \
 cargo build --release && \
 sudo mkdir -p /usr/lib/janus/plugins && \
 sudo mkdir -p /usr/lib/janus/events && \
