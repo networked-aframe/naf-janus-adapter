@@ -127,9 +127,13 @@
           adapter.requestedOccupants = adapter.availableOccupants;
           const clientId = genClientId(); // generate a random 16 characters string, but you can use a uuid4 for example
           adapter.setClientId(clientId);
+          // See https://bugs.webkit.org/show_bug.cgi?id=236219 and workaround described in comment
+          // https://bugs.webkit.org/show_bug.cgi?id=218012#c37 to fix low volume on Safari iOS 16.5 compared to Chrome iOS
+          if (navigator.audioSession) navigator.audioSession.type = 'play-and-record';
           navigator.mediaDevices
             .getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }})
             .then((stream) => {
+              if (navigator.audioSession) navigator.audioSession.type = 'playback';
               const audioSystem = scene.systems.audio;
               audioSystem.addStreamToOutboundAudio("microphone", stream);
               adapter.setLocalMediaStream(audioSystem.outboundStream).then(() => {
