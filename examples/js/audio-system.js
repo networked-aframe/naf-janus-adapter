@@ -103,7 +103,24 @@ async function enableChromeAEC(gainNode) {
 AFRAME.registerSystem("audio", {
   init() {
     const sceneEl = this.el;
+    sceneEl.audioListener = sceneEl.audioListener || new THREE.AudioListener();
+    if (sceneEl.camera) {
+      sceneEl.camera.add(sceneEl.audioListener);
+    }
+    sceneEl.addEventListener("camera-set-active", (evt) => {
+      evt.detail.cameraEl.getObject3D("camera").add(sceneEl.audioListener);
+    });
+
     this.audioContext = THREE.AudioContext.getContext();
+    this.audioNodes = new Map();
+    this.mediaStreamDestinationNode = this.audioContext.createMediaStreamDestination();
+    this.outboundStream = this.mediaStreamDestinationNode.stream;
+    this.outboundGainNode = this.audioContext.createGain();
+    this.outboundAnalyser = this.audioContext.createAnalyser();
+    this.outboundAnalyser.fftSize = 32;
+    this.analyserLevels = new Uint8Array(this.outboundAnalyser.fftSize);
+    this.outboundGainNode.connect(this.outboundAnalyser);
+    this.outboundAnalyser.connect(this.mediaStreamDestinationNode);
     this.audioContextNeedsToBeResumed = false;
 
     /**
@@ -142,5 +159,29 @@ AFRAME.registerSystem("audio", {
 
     document.body.addEventListener("touchend", resume, false);
     document.body.addEventListener("mouseup", resume, false);
+  },
+
+  addStreamToOutboundAudio(id, mediaStream) {
+    if (this.audioNodes.has(id)) {
+      this.removeStreamFromOutboundAudio(id);
+    }
+
+    const sourceNode = this.audioContext.createMediaStreamSource(mediaStream);
+    const gainNode = this.audioContext.createGain();
+    sourceNode.connect(gainNode);
+    gainNode.connect(this.outboundGainNode);
+    this.audioNodes.set(id, { sourceNode, gainNode });
+  },
+
+  removeStreamFromOutboundAudio(id) {
+    if (this.audioNodes.has(id)) {
+      const nodes = this.audioNodes.get(id);
+      nodes.sourceNode.disconnect();
+      for (const track of nodes.sourceNode.mediaStream.getAudioTracks()) {
+        track.stop();
+      }
+      nodes.gainNode.disconnect();
+      this.audioNodes.delete(id);
+    }
   },
 });
