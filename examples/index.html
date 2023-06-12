@@ -5,13 +5,12 @@
   <title>Audio Example — naf-janus-adapter</title>
   <meta name="description" content="Audio Example — naf-janus-adapter">
 
-  <script src="https://aframe.io/releases/1.3.0/aframe.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/networked-aframe@^0.9.0/dist/networked-aframe.min.js" crossorigin="anonymous"></script>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/networked-aframe@^0.11.0/dist/networked-aframe.min.js" crossorigin="anonymous"></script>
   <script src="https://webrtc.github.io/adapter/adapter-latest.js" crossorigin="anonymous"></script>
-  <script src="/dist/naf-janus-adapter.js"></script>
+  <script src="./dist/naf-janus-adapter.js"></script>
 
   <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/aframe-particle-system-component@1.0.5/dist/aframe-particle-system-component.min.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -58,7 +57,6 @@
     <a-entity light="color: #ffaaff; intensity: 1.5" position="5 5 5"></a-entity>
 
     <a-sky src="#sky" rotation="0 -90 0"></a-sky>
-    <a-entity id="particles" particle-system="preset: snow"></a-entity>
   </a-scene>
 
   <!-- GitHub Corner. -->
@@ -108,13 +106,6 @@
         num += Math.floor(Math.random() * 10).toString();
       }
       return num;
-    }
-
-    // On mobile remove elements that are resource heavy
-    var isMobile = AFRAME.utils.device.isMobile();
-    if (isMobile) {
-      var particles = document.getElementById('particles');
-      particles.parentNode.removeChild(particles);
     }
 
     // Prompt for audio.
