@@ -110,7 +110,9 @@
           navigator.mediaDevices
             .getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }})
             .then((stream) => {
-              adapter.setLocalMediaStream(stream).then(() => {
+              const audioSystem = scene.systems.audio;
+              audioSystem.addStreamToOutboundAudio("microphone", stream);
+              adapter.setLocalMediaStream(audioSystem.outboundStream).then(() => {
                 // Note that networked-scene audio:true option has no effect with the janus adapter
                 adapter.enableMicrophone(true); // set it to false if you want to be muted initially.
               });
