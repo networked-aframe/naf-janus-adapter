@@ -12,6 +12,7 @@
     ></script>
     <script src="https://webrtc.github.io/adapter/adapter-latest.js" crossorigin="anonymous"></script>
     <script src="./dist/naf-janus-adapter.js"></script>
+    <script src="./js/audio-system.js"></script>
 
     <script
       src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"
@@ -48,6 +49,7 @@
 
   <body>
     <a-scene
+      audio
       networked-scene="
         room: 1;
         debug: true;
