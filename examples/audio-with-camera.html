@@ -45,6 +45,7 @@
         return components;
       };
     </script>
+    <link rel="stylesheet" type="text/css" href="./css/style.css" />
   </head>
 
   <body>
@@ -87,7 +88,7 @@
         <!-- /Templates -->
       </a-assets>
 
-      <a-entity id="cameraRig">
+      <a-entity id="rig">
         <a-entity
           id="player"
           networked="template:#avatar-template;attachTemplateToLocal:false;"
@@ -104,24 +105,8 @@
       <a-entity light="type:ambient;intensity:0.5"></a-entity>
     </a-scene>
 
-    <style>
-      .actions {
-        position: absolute;
-        display: flex;
-        bottom: 3%;
-        left: 3%;
-      }
-
-      .button {
-        cursor: pointer;
-        background: #fff;
-        height: 40px;
-        width: 130px;
-        border-radius: 30px;
-      }
-    </style>
-
     <div class="actions">
+      <button id="mic-btn" type="button" class="button">Mute Mic</button>
       <button id="camera-btn" type="button" class="button">Show Camera</button>
       <button id="scene-btn" type="button" class="button">Start streaming scene</button>
     </div>
@@ -132,6 +117,7 @@
       }
 
       const state = {};
+      state.micEnabled = true; // set it to false if you want to be muted initially.
       state.currentStream = null;
       state.cameraEnabled = false;
       state.sceneStreamingEnabled = false;
@@ -139,8 +125,17 @@
       // Prompt for audio.
       document.addEventListener("DOMContentLoaded", () => {
         const scene = document.querySelector("a-scene");
+        const micBtnEl = document.getElementById('mic-btn');
         const cameraBtnEl = document.getElementById("camera-btn");
         const sceneBtnEl = document.getElementById("scene-btn");
+
+        // Handle mic button click (Mute and Unmute)
+        micBtnEl.addEventListener('click', function () {
+          NAF.connection.adapter.enableMicrophone(!state.micEnabled);
+          state.micEnabled = !state.micEnabled;
+          micBtnEl.textContent = state.micEnabled ? 'Mute Mic' : 'Unmute Mic';
+        });
+        micBtnEl.textContent = state.micEnabled ? 'Mute Mic' : 'Unmute Mic';
 
         const stopAndRemoveVideoTrack = async () => {
           const videoTracks = state.currentStream.getVideoTracks();
@@ -193,17 +188,21 @@
           sceneBtnEl.textContent = state.sceneStreamingEnabled ? "Stop streaming scene" : "Start streaming scene";
         });
 
+        // TODO add example of tab screenshare with audio
+        // audioSystem.addStreamToOutboundAudio("screenshare", newStream);
+
         scene.addEventListener("adapter-ready", ({ detail: adapter }) => {
           const clientId = genClientId(); // generate a random 16 characters string, but you can use a uuid4 for example
           adapter.setClientId(clientId);
           navigator.mediaDevices
             .getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }})
             .then((stream) => {
-              adapter.setLocalMediaStream(stream).then(() => {
+              const audioSystem = scene.systems.audio;
+              audioSystem.addStreamToOutboundAudio("microphone", stream);
+              state.currentStream = audioSystem.outboundStream;
+              adapter.setLocalMediaStream(audioSystem.outboundStream).then(() => {
                 // Note that networked-scene audio:true option has no effect with the janus adapter
-                adapter.enableMicrophone(true); // set it to false if you want to be muted initially.
-                state.currentStream = stream;
-                adapter.setLocalMediaStream(stream);
+                adapter.enableMicrophone(state.micEnabled);
               });
             })
             .catch((err) => {
