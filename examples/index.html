@@ -55,7 +55,7 @@
         room: 1;
         debug: true;
         adapter: janus;
-        connectOnLoad: true;
+        connectOnLoad: false;
         serverURL: wss://preprod-janus.example.com/janus;
       "
     >
@@ -99,6 +99,7 @@
 
     <div class="actions">
       <button id="mic-btn" type="button" class="button">Mute Mic</button>
+      <button id="enter-room-btn" type="button" class="button">Enter room</button>
     </div>
 
     <script>
@@ -113,6 +114,14 @@
       document.addEventListener("DOMContentLoaded", () => {
         const scene = document.querySelector("a-scene");
         const micBtnEl = document.getElementById('mic-btn');
+        const enterRoomBtnEl = document.getElementById('enter-room-btn');
+
+        enterRoomBtnEl.addEventListener('click', function () {
+          enterRoomBtnEl.style.display = 'none';
+          scene.components["networked-scene"].connect().then(() => {
+            console.log("connected");
+          });
+        });
 
         // Handle mic button click (Mute and Unmute)
         micBtnEl.addEventListener('click', function () {
