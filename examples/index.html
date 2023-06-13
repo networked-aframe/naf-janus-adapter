@@ -150,6 +150,7 @@
           adapter.requestedOccupants = adapter.availableOccupants;
           const clientId = genClientId(); // generate a random 16 characters string, but you can use a uuid4 for example
           adapter.setClientId(clientId);
+          const audioSystem = scene.systems.audio;
           adapter.setLocalMediaStream(audioSystem.outboundStream).then(() => {
             // Note that networked-scene audio:true option has no effect with the janus adapter
             adapter.enableMicrophone(state.micEnabled);
