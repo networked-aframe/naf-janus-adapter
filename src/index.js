@@ -186,7 +186,7 @@ class JanusAdapter {
     this.onReconnectionError = reconnectionErrorListener;
   }
 
-  setLoops(loops) {
+  setEventLoops(loops) {
     this.loops = loops;
   }
 
@@ -499,7 +499,7 @@ class JanusAdapter {
     var conn = new RTCPeerConnection(this.peerConnectionConfig || DEFAULT_PEER_CONNECTION_CONFIG);
 
     debug("pub waiting for sfu");
-    await handle.attach("janus.plugin.sfu", this.loops && this.clientId? parseInt(this.clientId) % this.loops : undefined);
+    await handle.attach("janus.plugin.sfu", this.loops && this.clientId ? parseInt(this.clientId) % this.loops : undefined);
 
     this.associate(conn, handle);
 
