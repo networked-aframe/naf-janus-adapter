@@ -1,4 +1,5 @@
-var mj = require("minijanus");
+/* global NAF */
+var mj = require("@networked-aframe/minijanus");
 mj.JanusSession.prototype.sendOriginal = mj.JanusSession.prototype.send;
 mj.JanusSession.prototype.send = function(type, signal) {
   return this.sendOriginal(type, signal).catch((e) => {
