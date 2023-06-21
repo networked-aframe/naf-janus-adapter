@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "debug": "^3.1.0",
-    "minijanus": "0.6.2",
+    "@networked-aframe/minijanus": "0.7.0",
     "sdp": "^3.0.0"
   },
   "resolutions": {
