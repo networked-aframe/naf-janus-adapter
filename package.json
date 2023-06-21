@@ -1,5 +1,5 @@
 {
-  "name": "naf-janus-adapter",
+  "name": "@networked-aframe/naf-janus-adapter",
   "version": "3.1.0",
   "description": "networked-aframe Janus network adapter",
   "main": "src/index.js",

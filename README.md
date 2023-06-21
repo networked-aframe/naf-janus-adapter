@@ -1,6 +1,6 @@
 # Networked-AFrame Janus Adapter
 
-[![npm](https://img.shields.io/npm/v/naf-janus-adapter.svg)](https://www.npmjs.com/package/naf-janus-adapter)
+[![npm](https://img.shields.io/npm/v/@networked-aframe/naf-janus-adapter.svg)](https://www.npmjs.com/package/@networked-aframe/naf-janus-adapter)
 
 Network adapter for [networked-aframe](https://github.com/networked-aframe/networked-aframe) that uses the Janus WebRTC server as a backend.
 
@@ -18,9 +18,9 @@ naf-janus-adapter should support anything that supports recent WebRTC standards 
 <html>
 <head>
   <script src="https://webrtc.github.io/adapter/adapter-latest.js" crossorigin="anonymous"></script>
-  <script src="https://aframe.io/releases/1.3.0/aframe.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/networked-aframe@^0.9.0/dist/networked-aframe.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/gh/networked-aframe/naf-janus-adapter@3.0.x/dist/naf-janus-adapter.min.js"></script>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/networked-aframe@^0.11.0/dist/networked-aframe.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/gh/networked-aframe/naf-janus-adapter@3.1.0/dist/naf-janus-adapter.min.js"></script>
 </head>
 <body>
    <a-scene networked-scene="
