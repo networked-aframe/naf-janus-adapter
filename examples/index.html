@@ -103,6 +103,19 @@
     </div>
 
     <script>
+const fetchMicDevices = () => {
+  // Note that mic permission needs to be accepted before we can see mic labels
+  // with the enumerateDevices api, so fetchMicDevices needs to be called
+  // after an initial getUserMedia.
+  return new Promise((resolve) => {
+    navigator.mediaDevices.enumerateDevices().then((mediaDevices) => {
+      const devices = mediaDevices
+        .filter((d) => d.kind === "audioinput")
+        .map((d) => ({ deviceId: d.deviceId, label: d.label }));
+      resolve(devices);
+    });
+  });
+};
       function genClientId() {
         return String(crypto.getRandomValues(new Uint32Array(1))[0]);
       }
@@ -140,6 +153,9 @@
             if (navigator.audioSession) navigator.audioSession.type = 'playback';
             const audioSystem = scene.systems.audio;
             audioSystem.addStreamToOutboundAudio("microphone", stream);
+	    fetchMicDevices().then((devices) => {
+              console.log(devices);
+            });
           })
           .catch((err) => {
             console.warn("Microphone access not allowed. This client will not broadcast audio.");
