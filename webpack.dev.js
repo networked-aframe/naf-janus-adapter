@@ -9,6 +9,12 @@ module.exports = merge(common, {
     server: {
       type: 'https'
     },
+    proxy: {
+      "/janus": {
+        target: "http://127.0.0.1:8188/janus",
+        ws: true
+      }
+    },
     static: {
       directory: path.resolve(__dirname, "examples")
     }
