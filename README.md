@@ -84,9 +84,12 @@ scene.addEventListener('adapter-ready', ({ detail: adapter }) => {
 
 ## Development
 
-- Dev: `npm run start`
+- Dev: `npm start`
 - Build: `npm run build`
 - Release: `npm run release`
+
+For development on the same LAN with `npm start` and if you run the janus docker image locally, you can use the config
+`serverURL: wss://192.168.1.15:8080/janus;` (change the ip by yours of course).
 
 ## Janus SFU deployment
 
