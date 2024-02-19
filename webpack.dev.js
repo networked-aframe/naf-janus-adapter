@@ -7,16 +7,17 @@ module.exports = merge(common, {
   devtool: "inline-source-map",
   devServer: {
     server: {
-      type: 'https'
+      type: "https",
     },
-    proxy: {
-      "/janus": {
+    proxy: [
+      {
+        context: ["/janus"],
         target: "http://127.0.0.1:8188/janus",
-        ws: true
-      }
-    },
+        ws: true,
+      },
+    ],
     static: {
-      directory: path.resolve(__dirname, "examples")
-    }
-  }
+      directory: path.resolve(__dirname, "examples"),
+    },
+  },
 });
