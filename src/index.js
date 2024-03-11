@@ -1045,10 +1045,14 @@ class JanusAdapter {
     } else {
       switch (this.unreliableTransport) {
         case "websocket":
-          this.publisher.handle.sendMessage({ kind: "data", body: JSON.stringify({ dataType, data }), whom: clientId });
+          if (this.ws.readyState === 1) { // OPEN
+            this.publisher.handle.sendMessage({ kind: "data", body: JSON.stringify({ dataType, data }), whom: clientId });
+          }
           break;
         case "datachannel":
-          this.publisher.unreliableChannel.send(JSON.stringify({ clientId, dataType, data }));
+          if (this.publisher.unreliableChannel.readyState === "open") {
+            this.publisher.unreliableChannel.send(JSON.stringify({ clientId, dataType, data }));
+          }
           break;
         default:
           this.unreliableTransport(clientId, dataType, data);
@@ -1063,10 +1067,14 @@ class JanusAdapter {
     } else {
       switch (this.reliableTransport) {
         case "websocket":
-          this.publisher.handle.sendMessage({ kind: "data", body: JSON.stringify({ dataType, data }), whom: clientId });
+          if (this.ws.readyState === 1) { // OPEN
+            this.publisher.handle.sendMessage({ kind: "data", body: JSON.stringify({ dataType, data }), whom: clientId });
+          }
           break;
         case "datachannel":
-          this.publisher.reliableChannel.send(JSON.stringify({ clientId, dataType, data }));
+          if (this.publisher.reliableChannel.readyState === "open") {
+            this.publisher.reliableChannel.send(JSON.stringify({ clientId, dataType, data }));
+          }
           break;
         default:
           this.reliableTransport(clientId, dataType, data);
@@ -1081,10 +1089,14 @@ class JanusAdapter {
     } else {
       switch (this.unreliableTransport) {
         case "websocket":
-          this.publisher.handle.sendMessage({ kind: "data", body: JSON.stringify({ dataType, data }) });
+          if (this.ws.readyState === 1) { // OPEN
+            this.publisher.handle.sendMessage({ kind: "data", body: JSON.stringify({ dataType, data }) });
+          }
           break;
         case "datachannel":
-          this.publisher.unreliableChannel.send(JSON.stringify({ dataType, data }));
+          if (this.publisher.unreliableChannel.readyState === "open") {
+            this.publisher.unreliableChannel.send(JSON.stringify({ dataType, data }));
+          }
           break;
         default:
           this.unreliableTransport(undefined, dataType, data);
@@ -1099,10 +1111,14 @@ class JanusAdapter {
     } else {
       switch (this.reliableTransport) {
         case "websocket":
-          this.publisher.handle.sendMessage({ kind: "data", body: JSON.stringify({ dataType, data }) });
+          if (this.ws.readyState === 1) { // OPEN
+            this.publisher.handle.sendMessage({ kind: "data", body: JSON.stringify({ dataType, data }) });
+          }
           break;
         case "datachannel":
-          this.publisher.reliableChannel.send(JSON.stringify({ dataType, data }));
+          if (this.publisher.reliableChannel.readyState === "open") {
+            this.publisher.reliableChannel.send(JSON.stringify({ dataType, data }));
+          }
           break;
         default:
           this.reliableTransport(undefined, dataType, data);
