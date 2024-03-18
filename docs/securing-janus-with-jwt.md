@@ -34,7 +34,8 @@ This will add those new dependencies:
     jose 1.11.1
 
 create `lib/myapp_web/perms_token.ex`
-```
+
+```elixir
 defmodule MyAppWeb.PermsToken do
   @moduledoc """
   generate token for creator of the room "123":
@@ -88,19 +89,25 @@ Start the backend with the environment variable pointing to the private key in P
 
 in `config/config.exs` (for development)
 
-    config :myapp, MyAppWeb.PermsToken, perms_key: System.get_env("AUTH_KEY_PRIVATE")
+```elixir
+config :myapp, MyAppWeb.PermsToken, perms_key: System.get_env("AUTH_KEY_PRIVATE")
+```
 
 in `config/releases.exs` or `config/runtime.exs` (for production):
 
-    config :meetingrooms, MyAppWeb.PermsToken, perms_key: System.get_env("AUTH_KEY_PRIVATE") ||
-    raise """
-    environment variable AUTH_KEY_PRIVATE is missing.
-    """
+```elixir
+config :meetingrooms, MyAppWeb.PermsToken, perms_key: System.get_env("AUTH_KEY_PRIVATE") ||
+raise """
+environment variable AUTH_KEY_PRIVATE is missing.
+"""
+```
 
 Do your security logic and generate a token like this for example:
 
-    MyAppWeb.PermsToken.token_for_perms(
-      %{user_id: user.id, kick_users: user.id == room.user_id, join_hub: true, room_ids: [room.slug]})
+```elixir
+MyAppWeb.PermsToken.token_for_perms(
+  %{user_id: user.id, kick_users: user.id == room.user_id, join_hub: true, room_ids: [room.slug]})
+```
 
 See what the different claims mean in the [janus-plugin-sfu api documentation](https://github.com/mozilla/janus-plugin-sfu/pull/86/files).
 
@@ -111,19 +118,23 @@ Send the generated token to the frontend via graphql, a REST api or websocket. T
 On the frontend side, get the JWT for the room and set it with `setJoinToken`.
 In the `adapter-ready` listener:
 
-    const permsToken = await callSomeAPItoGetTheToken();
-    adapter.setJoinToken(permsToken);
+```js
+const permsToken = await callSomeAPItoGetTheToken();
+adapter.setJoinToken(permsToken);
+```
 
 The room should now be secure.
 
 But wait, this is not enough.
 The JWT is valid here 5 minutes. If participant A joins the room and participant B joins the room 5 minutes later, B will hear A, but A won't hear B because A couldn't subscribe to B's audio because of an expired token (`addOccupant/createSubscriber` called after receiving a `join` event in naf-janus-adapter). You will get in janus logs 
+
 ```
 [WARN] Rejecting join from 0x7fb91400fc50 to room my-room as user 3196610745608672. Error: ExpiredSignature
 ```
 
 You need to renew the JWT regularly, like every 4 minutes, you can hard code the 4 minutes in the code below (`const nextRefresh = 4 * 60 * 1000;`) or check the `exp` in the JWT with [jwt-decode](https://www.npmjs.com/package/jwt-decode) and subtract a margin like 1 min (in case you change the ttl of the JWT in your backend later) . Here is an example:
-```
+
+```js
 import jwt_decode from "jwt-decode";
 
 const refreshPermsToken = async () => {
