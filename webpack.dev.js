@@ -1,8 +1,7 @@
 const path = require("path");
-const { merge } = require("webpack-merge");
-const common = require("./webpack.common");
 
-module.exports = merge(common, {
+module.exports = {
+  extends: ['webpack.common.js'],
   mode: "development",
   devtool: "inline-source-map",
   devServer: {
@@ -20,4 +19,4 @@ module.exports = merge(common, {
       directory: path.resolve(__dirname, "examples"),
     },
   },
-});
+};
