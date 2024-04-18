@@ -49,6 +49,22 @@
   </head>
 
   <body>
+    <!--
+      For development, networked-scene is configured with:
+
+        adapter: janus
+        serverURL: wss://192.168.1.15:8080/janus;
+
+      Run janus container locally:
+
+        cd janus-plugin-sfu/docker
+        docker compose up
+
+        cd naf-janus-adapter
+        npm start # to have https proxy on 8080 to janus http://127.0.0.1:8188/janus
+
+      go to https://192.168.1.15:8080
+    -->
     <a-scene
       audio
       networked-scene="
@@ -56,7 +72,7 @@
         debug: true;
         adapter: janus;
         connectOnLoad: true;
-        serverURL: wss://preprod-janus.example.com/janus;
+        serverURL: wss://192.168.1.15:8080/janus;
       "
     >
       <a-assets>
@@ -106,34 +122,97 @@
         return String(crypto.getRandomValues(new Uint32Array(1))[0]);
       }
 
+      const setupPeerConnectionConfig = (adapter, iceServers) => {
+        const qs = new URLSearchParams(location.search);
+        const forceTurn = qs.get("force_turn");
+        const forceTcp = qs.get("force_tcp");
+        const peerConnectionConfig = {};
+
+        if (iceServers && iceServers.urls !== null) {
+          if (forceTcp) {
+            iceServers.urls = iceServers.urls.filter((url) => url.startsWith("turn") && url.endsWith("tcp"));
+          }
+          const hasStunServer = !!iceServers.urls.find((url) => url.startsWith("stun"));
+          const newIceServers = [];
+          if (!forceTcp && !forceTurn && !hasStunServer) {
+            newIceServers.push({ urls: "stun:stun1.l.google.com:19302" });
+          }
+          // remove __typename from the graphql query
+          newIceServers.push({
+            username: iceServers.username,
+            credential: iceServers.credential,
+            urls: iceServers.urls,
+          });
+
+          peerConnectionConfig.iceServers = newIceServers;
+
+          if (forceTurn || forceTcp) {
+            peerConnectionConfig.iceTransportPolicy = "relay";
+          }
+        } else {
+          peerConnectionConfig.iceServers = [
+            { urls: "stun:stun1.l.google.com:19302" },
+            { urls: "stun:stun2.l.google.com:19302" },
+          ];
+        }
+
+        adapter.setPeerConnectionConfig(peerConnectionConfig);
+      };
+
       const state = {};
       state.micEnabled = true; // set it to false if you want to be muted initially.
 
       // Prompt for audio.
       document.addEventListener("DOMContentLoaded", () => {
         const scene = document.querySelector("a-scene");
-        const micBtnEl = document.getElementById('mic-btn');
+        const micBtnEl = document.getElementById("mic-btn");
 
         // Handle mic button click (Mute and Unmute)
-        micBtnEl.addEventListener('click', function () {
+        micBtnEl.addEventListener("click", function () {
           NAF.connection.adapter.enableMicrophone(!state.micEnabled);
           state.micEnabled = !state.micEnabled;
-          micBtnEl.textContent = state.micEnabled ? 'Mute Mic' : 'Unmute Mic';
+          micBtnEl.textContent = state.micEnabled ? "Mute Mic" : "Unmute Mic";
         });
-        micBtnEl.textContent = state.micEnabled ? 'Mute Mic' : 'Unmute Mic';
+        micBtnEl.textContent = state.micEnabled ? "Mute Mic" : "Unmute Mic";
 
         scene.addEventListener("adapter-ready", ({ detail: adapter }) => {
           // We don't use the syncOccupants API, set requestedOccupants to be the same array instance as availableOccupants
           adapter.requestedOccupants = adapter.availableOccupants;
+          // See https://github.com/networked-aframe/naf-janus-adapter/issues/14 to properly protect the credentials of the turn server
+          // const iceServers = {
+          //   credential: "TheCredential",
+          //   urls: [
+          //     "stun:fr-turn6.xirsys.com",
+          //     "turn:fr-turn6.xirsys.com:80?transport=udp",
+          //     "turn:fr-turn6.xirsys.com:3478?transport=udp",
+          //     "turn:fr-turn6.xirsys.com:80?transport=tcp",
+          //     "turn:fr-turn6.xirsys.com:3478?transport=tcp",
+          //     "turns:fr-turn6.xirsys.com:443?transport=tcp",
+          //     "turns:fr-turn6.xirsys.com:5349?transport=tcp",
+          //   ],
+          //   username: "TheUserName",
+          // };
+          const iceServers = {
+            urls: ["stun:stun1.l.google.com:19302"],
+          };
+          setupPeerConnectionConfig(adapter, iceServers);
+
+          // See https://github.com/networked-aframe/naf-janus-adapter/issues/48 to better handle the connection error.
+          // Here we just log the error to not have an infinite reconnection.
+          adapter.onReconnectionError = () => console.error("connect_error");
+          adapter.onReconnected = () => {
+            console.log("reconnected");
+          };
+
           const clientId = genClientId(); // generate a random 16 characters string, but you can use a uuid4 for example
           adapter.setClientId(clientId);
           // See https://bugs.webkit.org/show_bug.cgi?id=236219 and workaround described in comment
           // https://bugs.webkit.org/show_bug.cgi?id=218012#c37 to fix low volume on Safari iOS 16.5 compared to Chrome iOS
-          if (navigator.audioSession) navigator.audioSession.type = 'play-and-record';
+          if (navigator.audioSession) navigator.audioSession.type = "play-and-record";
           navigator.mediaDevices
-            .getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }})
+            .getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
             .then((stream) => {
-              if (navigator.audioSession) navigator.audioSession.type = 'playback';
+              if (navigator.audioSession) navigator.audioSession.type = "playback";
               const audioSystem = scene.systems.audio;
               audioSystem.addStreamToOutboundAudio("microphone", stream);
               adapter.setLocalMediaStream(audioSystem.outboundStream).then(() => {
