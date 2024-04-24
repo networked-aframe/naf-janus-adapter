@@ -337,10 +337,12 @@ class JanusAdapter {
 
     this.leftOccupants.delete(occupantId);
 
+    var subscriber;
     if (occupantId.endsWith("-l")) {
-      this.occupants[occupantId] = {};
+      subscriber = {};
+      this.occupants[occupantId] = subscriber;
     } else {
-      var subscriber = await this.createSubscriber(occupantId);
+      subscriber = await this.createSubscriber(occupantId);
 
       if (!subscriber) return;
 
