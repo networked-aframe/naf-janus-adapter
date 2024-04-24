@@ -589,7 +589,7 @@ class JanusAdapter {
     var conn = new RTCPeerConnection(this.peerConnectionConfig || DEFAULT_PEER_CONNECTION_CONFIG);
 
     debug(occupantId + ": sub waiting for sfu");
-    await handle.attach("janus.plugin.sfu", this.loops ? parseInt(occupantId.replace("-l", "")) % this.loops : undefined);
+    await handle.attach("janus.plugin.sfu", this.loops ? parseInt(occupantId) % this.loops : undefined);
 
     this.associate(conn, handle);
 
