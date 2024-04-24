@@ -337,13 +337,17 @@ class JanusAdapter {
 
     this.leftOccupants.delete(occupantId);
 
-    var subscriber = await this.createSubscriber(occupantId);
+    if (occupantId.endsWith("-l")) {
+      this.occupants[occupantId] = {};
+    } else {
+      var subscriber = await this.createSubscriber(occupantId);
 
-    if (!subscriber) return;
+      if (!subscriber) return;
 
-    this.occupants[occupantId] = subscriber;
+      this.occupants[occupantId] = subscriber;
 
-    this.setMediaStream(occupantId, subscriber.mediaStream);
+      this.setMediaStream(occupantId, subscriber.mediaStream);
+    }
 
     // Call the Networked AFrame callbacks for the new occupant.
     this.onOccupantConnected(occupantId);
@@ -363,7 +367,7 @@ class JanusAdapter {
 
     if (this.occupants[occupantId]) {
       // Close the subscriber peer connection. Which also detaches the plugin handle.
-      this.occupants[occupantId].conn.close();
+      this.occupants[occupantId].conn?.close();
       delete this.occupants[occupantId];
     }
 
@@ -445,7 +449,7 @@ class JanusAdapter {
     var conn = new RTCPeerConnection(this.peerConnectionConfig || DEFAULT_PEER_CONNECTION_CONFIG);
 
     debug("pub waiting for sfu");
-    await handle.attach("janus.plugin.sfu", this.loops && this.clientId ? parseInt(this.clientId) % this.loops : undefined);
+    await handle.attach("janus.plugin.sfu", this.loops && this.clientId ? parseInt(this.clientId.replace("-l", "")) % this.loops : undefined);
 
     this.associate(conn, handle);
 
@@ -585,7 +589,7 @@ class JanusAdapter {
     var conn = new RTCPeerConnection(this.peerConnectionConfig || DEFAULT_PEER_CONNECTION_CONFIG);
 
     debug(occupantId + ": sub waiting for sfu");
-    await handle.attach("janus.plugin.sfu", this.loops ? parseInt(occupantId) % this.loops : undefined);
+    await handle.attach("janus.plugin.sfu", this.loops ? parseInt(occupantId.replace("-l", "")) % this.loops : undefined);
 
     this.associate(conn, handle);
 
