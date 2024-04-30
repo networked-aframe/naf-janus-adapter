@@ -924,6 +924,10 @@ class JanusAdapter {
     }
   }
 
+  getLocalMediaStream() {
+    return this.localMediaStream;
+  }
+
   async setLocalMediaStream(stream) {
     // our job here is to make sure the connection winds up with RTP senders sending the stuff in this stream,
     // and not the stuff that isn't in this stream. strategy is to replace existing tracks if we can, add tracks
@@ -944,12 +948,6 @@ class JanusAdapter {
         if (sender != null) {
           if (sender.replaceTrack) {
             await sender.replaceTrack(t);
-
-            // Workaround https://bugzilla.mozilla.org/show_bug.cgi?id=1576771
-            if (t.kind === "video" && t.enabled && navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-              t.enabled = false;
-              setTimeout(() => t.enabled = true, 1000);
-            }
           } else {
             // Fallback for browsers that don't support replaceTrack. At this time of this writing
             // most browsers support it, and testing this code path seems to not work properly
