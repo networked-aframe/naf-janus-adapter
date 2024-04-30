@@ -928,7 +928,7 @@ class JanusAdapter {
     return this.localMediaStream;
   }
 
-  setLocalMediaStream(stream) {
+  async setLocalMediaStream(stream) {
     // our job here is to make sure the connection winds up with RTP senders sending the stuff in this stream,
     // and not the stuff that isn't in this stream. strategy is to replace existing tracks if we can, add tracks
     // that we can't replace, and disable tracks that don't exist anymore.
@@ -947,7 +947,7 @@ class JanusAdapter {
 
         if (sender != null) {
           if (sender.replaceTrack) {
-            sender.replaceTrack(t);
+            await sender.replaceTrack(t);
           } else {
             // Fallback for browsers that don't support replaceTrack. At this time of this writing
             // most browsers support it, and testing this code path seems to not work properly
