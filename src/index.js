@@ -182,6 +182,16 @@ class JanusAdapter {
   }
 
   connect() {
+    if (this.serverUrl === '/') {
+      this.serverUrl = '/janus';
+    }
+    if (this.serverUrl === '/janus') {
+      if (location.protocol === 'https:') {
+        this.serverUrl = 'wss://' + location.host + '/janus';
+      } else {
+        this.serverUrl = 'ws://' + location.host + '/janus';
+      }
+    }
     debug(`connecting to ${this.serverUrl}`);
 
     const websocketConnection = new Promise((resolve, reject) => {

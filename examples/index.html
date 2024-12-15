@@ -59,7 +59,7 @@
       For development, networked-scene is configured with:
 
         adapter: janus
-        serverURL: wss://192.168.1.15:8080/janus;
+        serverURL: /janus;
 
       Run janus container locally:
 
@@ -67,9 +67,9 @@
         docker compose up
 
         cd naf-janus-adapter
-        npm start # to have https proxy on 8080 to janus http://127.0.0.1:8188/janus
+        npm start # to serve the examples and proxy /janus to http://127.0.0.1:8188/janus
 
-      go to https://192.168.1.15:8080
+      go to https://localhost:8080
     -->
     <a-scene
       audio
@@ -78,7 +78,6 @@
         debug: false;
         adapter: janus;
         connectOnLoad: true;
-        serverURL: wss://192.168.1.15:8080/janus;
       "
       renderer="physicallyCorrectLights: true;"
     >

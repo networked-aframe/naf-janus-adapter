@@ -26,11 +26,21 @@ naf-janus-adapter should support anything that supports recent WebRTC standards 
    <a-scene networked-scene="
         room: 1;
         adapter: janus;
-        serverURL: wss://preprod-janus.example.com/janus;
       ">
   </a-scene>
 </body>
 </html>
+```
+
+Default serverURL is `/janus` which is converted to `'wss://' + location.host + '/janus'`.
+You can also specify a full url if the server is not the same:
+
+```html
+   <a-scene networked-scene="
+        room: 1;
+        adapter: janus;
+        serverURL: wss://janus.example.com/janus;
+      ">
 ```
 
 Compared to other adapters like easyrtc, the janus adapter has a specific API,
@@ -77,9 +87,6 @@ NAF.connection.adapter.syncOccupants(NAF.connection.adapter.availableOccupants);
 - Dev: `npm start`
 - Build: `npm run build`
 - Release: `npm run release`
-
-For development on the same LAN with `npm start` and if you run the janus docker image locally, you can use the config
-`serverURL: wss://192.168.1.15:8080/janus;` (change the ip by yours of course).
 
 ## Janus SFU deployment
 
