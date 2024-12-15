@@ -31,8 +31,14 @@
           NAF.schemas.add({
             template: "#avatar-template",
             components: [
-              "position",
-              "rotation",
+              {
+                component: "position",
+                requiresNetworkUpdate: NAF.utils.vectorRequiresUpdate(0.001)
+              },
+              {
+                component: "rotation",
+                requiresNetworkUpdate: NAF.utils.vectorRequiresUpdate(0.5)
+              },
               {
                 selector: ".head",
                 component: "material",
@@ -68,8 +74,8 @@
     <a-scene
       audio
       networked-scene="
-        room: 1;
-        debug: true;
+        room: audio;
+        debug: false;
         adapter: janus;
         connectOnLoad: true;
         serverURL: wss://192.168.1.15:8080/janus;
@@ -81,7 +87,7 @@
 
         <!-- Avatar -->
         <template id="avatar-template">
-          <a-entity class="avatar" networked-audio-source>
+          <a-entity class="avatar" networked-audio-source="positional: true">
             <a-sphere class="head" scale="0.45 0.5 0.4"></a-sphere>
             <a-entity class="face" position="0 0.05 0">
               <a-sphere class="eye" color="#efefef" position="0.16 0.1 -0.35" scale="0.12 0.12 0.12">
@@ -110,8 +116,8 @@
         </a-entity>
       </a-entity>
 
-      <a-entity environment="preset:arches"></a-entity>
-      <a-entity light="type:ambient;intensity:1.0"></a-entity>
+      <a-entity environment="preset:starry;groundColor:#000000"></a-entity>
+      <a-entity light="type:ambient;intensity:0.5"></a-entity>
     </a-scene>
 
     <div class="actions">
@@ -179,6 +185,9 @@
         scene.addEventListener("adapter-ready", ({ detail: adapter }) => {
           // We don't use the syncOccupants API, set requestedOccupants to be the same array instance as availableOccupants
           adapter.requestedOccupants = adapter.availableOccupants;
+          // adapter.reliableTransport = "websocket";
+          // adapter.unreliableTransport = "websocket";
+          // adapter.setEventLoops(4);
           // See https://github.com/networked-aframe/naf-janus-adapter/issues/14 to properly protect the credentials of the turn server
           // const iceServers = {
           //   credential: "TheCredential",
@@ -207,13 +216,9 @@
 
           const clientId = genClientId(); // generate a random 16 characters string, but you can use a uuid4 for example
           adapter.setClientId(clientId);
-          // See https://bugs.webkit.org/show_bug.cgi?id=236219 and workaround described in comment
-          // https://bugs.webkit.org/show_bug.cgi?id=218012#c37 to fix low volume on Safari iOS 16.5 compared to Chrome iOS
-          if (navigator.audioSession) navigator.audioSession.type = "play-and-record";
           navigator.mediaDevices
             .getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
             .then((stream) => {
-              if (navigator.audioSession) navigator.audioSession.type = "playback";
               const audioSystem = scene.systems.audio;
               audioSystem.addStreamToOutboundAudio("microphone", stream);
               adapter.setLocalMediaStream(audioSystem.outboundStream).then(() => {
