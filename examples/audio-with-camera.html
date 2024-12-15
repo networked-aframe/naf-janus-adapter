@@ -31,8 +31,14 @@
           NAF.schemas.add({
             template: "#avatar-template",
             components: [
-              "position",
-              "rotation",
+              {
+                component: "position",
+                requiresNetworkUpdate: NAF.utils.vectorRequiresUpdate(0.001)
+              },
+              {
+                component: "rotation",
+                requiresNetworkUpdate: NAF.utils.vectorRequiresUpdate(0.5)
+              },
               {
                 selector: ".head",
                 component: "material",
@@ -52,8 +58,8 @@
     <a-scene
       audio
       networked-scene="
-        room: 1;
-        debug: true;
+        room: audiovideo;
+        debug: false;
         adapter: janus;
         connectOnLoad: true;
         serverURL: wss://preprod-janus.example.com/janus;
@@ -65,7 +71,7 @@
 
         <!-- Avatar -->
         <template id="avatar-template">
-          <a-entity class="avatar" networked-audio-source>
+          <a-entity class="avatar" networked-audio-source="positional: true">
             <a-plane
               color="#fff"
               width="4"
@@ -102,7 +108,7 @@
         </a-entity>
       </a-entity>
 
-      <a-entity environment="preset:arches"></a-entity>
+      <a-entity environment="preset:starry;groundColor:#000000"></a-entity>
       <a-entity light="type:ambient;intensity:0.5"></a-entity>
     </a-scene>
 
@@ -126,17 +132,17 @@
       // Prompt for audio.
       document.addEventListener("DOMContentLoaded", () => {
         const scene = document.querySelector("a-scene");
-        const micBtnEl = document.getElementById('mic-btn');
+        const micBtnEl = document.getElementById("mic-btn");
         const cameraBtnEl = document.getElementById("camera-btn");
         const sceneBtnEl = document.getElementById("scene-btn");
 
         // Handle mic button click (Mute and Unmute)
-        micBtnEl.addEventListener('click', function () {
+        micBtnEl.addEventListener("click", function () {
           NAF.connection.adapter.enableMicrophone(!state.micEnabled);
           state.micEnabled = !state.micEnabled;
-          micBtnEl.textContent = state.micEnabled ? 'Mute Mic' : 'Unmute Mic';
+          micBtnEl.textContent = state.micEnabled ? "Mute Mic" : "Unmute Mic";
         });
-        micBtnEl.textContent = state.micEnabled ? 'Mute Mic' : 'Unmute Mic';
+        micBtnEl.textContent = state.micEnabled ? "Mute Mic" : "Unmute Mic";
 
         const stopAndRemoveVideoTrack = async () => {
           const videoTracks = state.currentStream.getVideoTracks();
@@ -195,13 +201,9 @@
         scene.addEventListener("adapter-ready", ({ detail: adapter }) => {
           const clientId = genClientId(); // generate a random 16 characters string, but you can use a uuid4 for example
           adapter.setClientId(clientId);
-          // See https://bugs.webkit.org/show_bug.cgi?id=236219 and workaround described in comment
-          // https://bugs.webkit.org/show_bug.cgi?id=218012#c37 to fix low volume on Safari iOS 16.5 compared to Chrome iOS
-          if (navigator.audioSession) navigator.audioSession.type = 'play-and-record';
           navigator.mediaDevices
             .getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }})
             .then((stream) => {
-              if (navigator.audioSession) navigator.audioSession.type = 'playback';
               const audioSystem = scene.systems.audio;
               audioSystem.addStreamToOutboundAudio("microphone", stream);
               state.currentStream = audioSystem.outboundStream;
