@@ -111,6 +111,7 @@ class JanusAdapter {
     this.reconnectionTimeout = null;
     this.maxReconnectionAttempts = 10;
     this.reconnectionAttempts = 0;
+    this.isReconnecting = false;
 
     this.publisher = null;
     this.occupantIds = [];
@@ -199,6 +200,10 @@ class JanusAdapter {
 
       this.session = new mj.JanusSession(this.ws.send.bind(this.ws), { timeoutMs: 40000 });
 
+      this.websocketConnectionPromise = {};
+      this.websocketConnectionPromise.resolve = resolve;
+      this.websocketConnectionPromise.reject = reject;
+
       this.ws.addEventListener("close", this.onWebsocketClose);
       this.ws.addEventListener("message", this.onWebsocketMessage);
 
@@ -281,12 +286,17 @@ class JanusAdapter {
       return;
     }
 
-    console.warn("Janus websocket closed unexpectedly.");
-    if (this.onReconnecting) {
-      this.onReconnecting(this.reconnectionDelay);
-    }
+    this.websocketConnectionPromise.reject(event);
 
-    this.reconnectionTimeout = setTimeout(() => this.reconnect(), this.reconnectionDelay);
+    if (!this.isReconnecting) {
+      this.isReconnecting = true;
+      console.warn("Janus websocket closed unexpectedly.");
+      if (this.onReconnecting) {
+        this.onReconnecting(this.reconnectionDelay);
+      }
+
+      this.reconnectionTimeout = setTimeout(() => this.reconnect(), this.reconnectionDelay);
+    }
   }
 
   reconnect() {
@@ -297,6 +307,7 @@ class JanusAdapter {
       .then(() => {
         this.reconnectionDelay = this.initialReconnectionDelay;
         this.reconnectionAttempts = 0;
+        this.isReconnecting = false;
 
         if (this.onReconnected) {
           this.onReconnected();
@@ -306,10 +317,16 @@ class JanusAdapter {
         this.reconnectionDelay += 1000;
         this.reconnectionAttempts++;
 
-        if (this.reconnectionAttempts > this.maxReconnectionAttempts && this.onReconnectionError) {
-          return this.onReconnectionError(
-            new Error("Connection could not be reestablished, exceeded maximum number of reconnection attempts.")
+        if (this.reconnectionAttempts > this.maxReconnectionAttempts) {
+          const error = new Error(
+            "Connection could not be reestablished, exceeded maximum number of reconnection attempts."
           );
+          if (this.onReconnectionError) {
+            return this.onReconnectionError(error);
+          } else {
+            console.warn(error);
+            return;
+          }
         }
 
         console.warn("Error during reconnect, retrying.");
