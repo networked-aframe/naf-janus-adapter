@@ -364,13 +364,19 @@ class JanusAdapter {
 
     this.leftOccupants.delete(occupantId);
 
-    var subscriber = await this.createSubscriber(occupantId);
+    var subscriber;
+    if (occupantId.endsWith("-l")) {
+      subscriber = {};
+      this.occupants[occupantId] = subscriber;
+    } else {
+      subscriber = await this.createSubscriber(occupantId);
 
-    if (!subscriber) return;
+      if (!subscriber) return;
 
-    this.occupants[occupantId] = subscriber;
+      this.occupants[occupantId] = subscriber;
 
-    this.setMediaStream(occupantId, subscriber.mediaStream);
+      this.setMediaStream(occupantId, subscriber.mediaStream);
+    }
 
     // Call the Networked AFrame callbacks for the new occupant.
     this.onOccupantConnected(occupantId);
@@ -390,7 +396,7 @@ class JanusAdapter {
 
     if (this.occupants[occupantId]) {
       // Close the subscriber peer connection. Which also detaches the plugin handle.
-      this.occupants[occupantId].conn.close();
+      this.occupants[occupantId].conn?.close();
       delete this.occupants[occupantId];
     }
 
